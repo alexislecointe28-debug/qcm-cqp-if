@@ -1,9 +1,10 @@
-const CACHE = 'cqp-v1';
+const CACHE = 'cqp-v2';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE).then(c => c.addAll(ASSETS))
+    // Ne PAS appeler skipWaiting() ici — on attend que l'utilisateur confirme
   );
 });
 
@@ -23,4 +24,9 @@ self.addEventListener('fetch', e => {
       return res;
     })).catch(() => caches.match('/index.html'))
   );
+});
+
+// Message depuis l'app pour forcer l'update
+self.addEventListener('message', e => {
+  if (e.data === 'SKIP_WAITING') self.skipWaiting();
 });
