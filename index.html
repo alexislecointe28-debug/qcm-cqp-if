@@ -102,6 +102,26 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .flag-btn{width:50px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .flag-btn.flagged{border-color:var(--orange);color:var(--orange)}
 
+/* ── EN SAVOIR PLUS ── */
+.esm-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.esm-btn:active{opacity:.8}
+.esm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end}
+.esm-overlay.open{display:flex}
+.esm-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:0 0 32px}
+.esm-handle{width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0}
+.esm-header{padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
+.esm-title{font-size:15px;font-weight:700;color:#0f1f33}
+.esm-close{width:32px;height:32px;background:#f1f5f9;border:none;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.esm-body{padding:16px 18px;font-size:13.5px;line-height:1.7;color:#334155}
+.esm-body h3{font-size:14px;font-weight:700;color:#0f1f33;margin:14px 0 6px}
+.esm-body p{margin:0 0 10px}
+.esm-body ul{padding-left:18px;margin:0 0 10px}
+.esm-body li{margin-bottom:4px}
+.esm-body svg{width:100%;height:auto;margin:12px 0;border-radius:10px;background:#f8fafc;padding:8px}
+.esm-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px;color:#94a3b8;font-size:13px}
+.esm-spinner{width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* ── RESULT ── */
 #result{padding:24px 20px;justify-content:space-between;overflow-y:auto}
 .result-header{text-align:center;margin-bottom:24px}
@@ -140,7 +160,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 147 questions • UC3 officiel</p>
+    <p class="app-sub">S'adapte à tes lacunes • 165 questions • UC3 officiel</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -197,6 +217,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 </div>
 
+
+<!-- ═══ EN SAVOIR PLUS MODAL ═══ -->
+<div class="esm-overlay" id="esm-overlay" onclick="closeESM(event)">
+  <div class="esm-sheet" id="esm-sheet">
+    <div class="esm-handle"></div>
+    <div class="esm-header">
+      <span class="esm-title" id="esm-title">En savoir plus</span>
+      <button class="esm-close" onclick="closeESMBtn()">×</button>
+    </div>
+    <div class="esm-body" id="esm-body">
+      <div class="esm-loading"><div class="esm-spinner"></div>Génération en cours…</div>
+    </div>
+  </div>
+</div>
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -405,6 +439,29 @@ const QDB = [
 {id:"n32",cat:"nutri",q:"Qu'est-ce que l'effet thermique des aliments (TEF) ?",opts:["La température à laquelle les aliments doivent être consommés","L'énergie dépensée pour digérer, absorber et métaboliser les nutriments","La chaleur dégagée par la cuisson des aliments","L'augmentation de la température corporelle après l'effort"],r:1,e:"L'<strong>effet thermique des aliments (TEF)</strong> représente l'énergie dépensée pour digérer et métaboliser la nourriture. Il varie selon les macronutriments : protéines = 20-30% (le plus élevé), glucides = 5-10%, lipides = 0-3%. Les protéines ont donc l'effet rassasiant et thermogénique le plus élevé."},
 {id:"n33",cat:"nutri",q:"Quel est l'apport quotidien en lipides recommandé chez un sportif ?",opts:["Moins de 10% des calories totales","20-35% des calories totales dont au moins 1/3 d'acides gras insaturés","50-60% des calories totales","Zéro lipide pour optimiser la performance"],r:1,e:"Les lipides doivent représenter <strong>20-35% des calories totales</strong> chez un sportif. Ils sont indispensables pour la synthèse hormonale (testostérone), l'absorption des vitamines liposolubles (A,D,E,K) et comme substrat énergétique de base. En dessous de 20%, les performances hormonales se dégradent."},
 {id:"n34",cat:"nutri",q:"Qu'est-ce que le microbiote intestinal et quel est son rôle dans la performance ?",opts:["Des bactéries pathogènes à éliminer","L'ensemble des micro-organismes intestinaux bénéfiques influençant immunité, inflammation et récupération","Un organe digestif secondaire","Un réservoir de glycogène supplémentaire"],r:1,e:"Le <strong>microbiote intestinal</strong> (anciennement 'flore intestinale') est l'ensemble des micro-organismes vivant dans l'intestin. Il influence l'<strong>immunité, l'inflammation systémique, l'absorption des nutriments et la récupération</strong>. Un microbiote diversifié (fibres, aliments fermentés) est associé à de meilleures performances."},
+
+// ─── ANATOMIE BONUS ───────────────────────────────────
+{id:"a37",cat:"anat",q:"Quelle est la différence entre une entorse et une élongation musculaire ?",opts:["L'entorse touche un muscle, l'élongation un ligament","L'entorse touche un ligament, l'élongation un muscle","Ce sont deux termes pour la même blessure","L'entorse touche un tendon, l'élongation un os"],r:1,e:"L'<strong>entorse</strong> = lésion ligamentaire (os-os). L'<strong>élongation</strong> = lésion musculaire légère (étirement excessif des fibres). La déchirure = rupture partielle, le claquage = rupture partielle à totale."},
+{id:"a38",cat:"anat",q:"Quel est le rôle de la rotule (patella) ?",opts:["Relier tibia et fibula","Augmenter le bras de levier du quadriceps et protéger le genou","Stabiliser la cheville","Relier fémur et tibia directement"],r:1,e:"La <strong>rotule</strong> est un os sésamoïde intégré dans le tendon quadricipital. Elle <strong>augmente le bras de levier du quadriceps</strong> et protège l'articulation du genou."},
+{id:"a39",cat:"anat",q:"Lors d'une mauvaise technique au développé couché (coudes trop écartés), quelle structure est à risque ?",opts:["Le nerf sciatique","Le tendon d'Achille","La coiffe des rotateurs (sus-épineux)","Le ligament croisé antérieur"],r:2,e:"Coudes trop écartés (90°) = <strong>impingement sous-acromial</strong> comprimant le <strong>sus-épineux</strong>. Correction : coudes à 45-75° du corps. C'est la blessure d'épaule la plus fréquente en musculation."},
+{id:"a40",cat:"anat",q:"Le valgus dynamique du genou est prévenu principalement par quel muscle ?",opts:["Les adducteurs","Le moyen fessier et les abducteurs de hanche","Les ischio-jambiers","Les rotateurs internes"],r:1,e:"Le <strong>valgus dynamique</strong> (genou qui rentre) est facteur de blessure du LCA. Il est prévenu par le <strong>moyen fessier</strong> fort. Cue technique : 'pousse les genoux vers l'extérieur' au squat."},
+{id:"a41",cat:"anat",q:"Combien de vertèbres lombaires y a-t-il ?",opts:["4","5","6","7"],r:1,e:"Il y a <strong>5 vertèbres lombaires</strong> (L1 à L5), les plus volumineuses car elles supportent le plus de charge. L5-S1 est le disque le plus souvent hernié."},
+{id:"a42",cat:"anat",q:"Quel muscle réalise la flexion dorsale (dorsiflexion) de la cheville ?",opts:["Soléaire","Gastrocnémien","Tibiale antérieur","Long péronier"],r:2,e:"Le <strong>tibiale antérieur</strong> est le principal fléchisseur dorsal (ramène le pied vers le haut). Sa faiblesse peut causer des périostites chez le coureur."},
+{id:"a43",cat:"anat",q:"Lors d'un rowing penché barre, quel rôle jouent les érecteurs du rachis ?",opts:["Agoniste du tirage","Fixateurs — maintiennent le rachis en position neutre (isométrique)","Antagonistes","Synergistes du biceps"],r:1,e:"Au rowing penché, les <strong>érecteurs + transverse</strong> maintiennent le rachis neutre en gainage isométrique. Leur défaillance = dos rond = risque de hernie. Le gainage est un prérequis aux exercices en porte-à-faux."},
+// ─── PHYSIOLOGIE BONUS ────────────────────────────────
+{id:"p37",cat:"physio",q:"Qu'est-ce que le cycle étirement-raccourcissement (CER) ?",opts:["Un cycle respiratoire","Stockage d'énergie élastique lors d'un pré-étirement excentrique puis restitution lors de la phase concentrique","Un type de fibre musculaire","La récupération entre deux séries"],r:1,e:"Le <strong>CER</strong> permet de produire plus de force en combinant phase excentrique rapide puis concentrique immédiate. Base de la pliométrie. Les tendons stockent l'énergie comme un ressort."},
+{id:"p38",cat:"physio",q:"Après combien de semaines d'arrêt total commence-t-on à perdre de la force musculaire ?",opts:["48 heures","1 semaine","2-4 semaines","3 mois"],r:2,e:"La force commence à décliner après <strong>2 à 4 semaines</strong> d'arrêt. La VO2max baisse plus vite (dès 10-14 jours). La masse musculaire se perd plus lentement. La mémoire musculaire accélère la récupération lors de la reprise."},
+{id:"p39",cat:"physio",q:"Quel est le rôle direct de l'ATP dans la contraction musculaire ?",opts:["Transporter l'oxygène","Fournir l'énergie pour le glissement des filaments actine-myosine","Stocker le glycogène","Réguler la température"],r:1,e:"L'<strong>ATP</strong> est la seule énergie directement utilisable par le muscle. Ses stocks durent ~2-3 sec → toutes les filières energétiques servent à le resynthétiser en permanence."},
+{id:"p40",cat:"physio",q:"À 70% de la FCmax, dans quelle zone d'entraînement se situe-t-on ?",opts:["Zone de récupération","Zone aérobie modérée (zone 2 / endurance fondamentale)","Zone anaérobie lactique","Zone VO2max"],r:1,e:"À <strong>70% FCmax</strong> = <strong>zone 2</strong> (endurance fondamentale) : effort confortable, conversation possible, forte oxydation des lipides. Zone recommandée pour 70-80% du volume aérobie."},
+{id:"p41",cat:"physio",q:"Qu'est-ce que le principe de variété en entraînement ?",opts:["Changer de sport chaque semaine","Varier exercices, angles, intensités et méthodes pour éviter la stagnation","Ne jamais refaire le même exercice","S'entraîner dans des endroits différents"],r:1,e:"Le principe de <strong>variété</strong> préconise de modifier périodiquement les paramètres (exercices, charges, tempos) pour maintenir l'adaptation et réduire les blessures de surutilisation."},
+// ─── NUTRITION BONUS ──────────────────────────────────
+{id:"n35",cat:"nutri",q:"Quel est l'apport recommandé en glucides pour un pratiquant de musculation 4-5x/semaine ?",opts:["0-1 g/kg/j (cétogène)","3-5 g/kg/j","8-12 g/kg/j","Pas de recommandation"],r:1,e:"Pour la musculation, les recommandations ISSN sont de <strong>3 à 5 g/kg/jour</strong>. Les glucides alimentent le glycogène, la performance et la récupération. En prise de masse : jusqu'à 5-7 g/kg."},
+{id:"n36",cat:"nutri",q:"Qu'est-ce que la whey isolate par rapport à la whey concentrate ?",opts:["Plus de glucides","Plus purifiée >90% protéines, quasi sans lactose — adaptée aux intolérants","Moins bonne qualité","Aucune différence"],r:1,e:"La <strong>whey isolate</strong> est ultra-filtrée : >90% de protéines, quasi sans lactose. La concentrate = 70-80% avec plus de lactose. À protéines égales, même effet sur la synthèse musculaire."},
+{id:"n37",cat:"nutri",q:"Quel est l'effet de l'alcool sur la synthèse protéique post-entraînement ?",opts:["Aucun effet","Favorise la récupération","Inhibe la synthèse protéique et perturbe le sommeil et la testostérone","Améliore la performance le lendemain"],r:2,e:"L'<strong>alcool inhibe la synthèse protéique</strong> (même à faible dose), réduit la testostérone et perturbe le sommeil réparateur. À éviter dans les 24h suivant une séance intense."},
+{id:"n38",cat:"nutri",q:"Qu'est-ce que la charge glycémique (CG) ?",opts:["Synonyme de l'index glycémique","CG = IG × g de glucides / 100 — tient compte de la portion réelle","Mesure la vitesse d'absorption uniquement","S'applique uniquement aux sportifs"],r:1,e:"La <strong>charge glycémique = IG × g de glucides / 100</strong>. Plus représentative que l'IG seul : la pastèque a un IG élevé (72) mais une CG faible (4) car peu de glucides par portion. CG < 10 = faible."},
+{id:"n39",cat:"nutri",q:"Quels sont les signes d'une déshydratation de 1-2% chez un sportif ?",opts:["Aucun signe perceptible","Soif, urine jaune foncé, légère baisse de performance de 10-20%","Crampes sévères et perte de connaissance","Augmentation de force"],r:1,e:"Dès <strong>1-2% de déshydratation</strong> : soif, urine jaune foncé, baisse de performance aérobie de 10-20%. La soif est déjà un signe de déshydratation. Règle : urine claire = bonne hydratation."},
+{id:"n40",cat:"nutri",q:"Le jeûne intermittent 16:8 est-il supérieur à une alimentation classique pour la prise de masse ?",opts:["Oui, il maximise l'anabolisme","Non, l'efficacité repose sur le bilan calorique total — il peut réduire la synthèse protéique si mal géré","Oui, il double la testostérone","Seuls les hommes peuvent le pratiquer"],r:1,e:"Le <strong>jeûne intermittent</strong> n'est pas supérieur à une alimentation structurée à calories égales. Chez les sportifs en force, concentrer les repas sur 8h peut réduire la synthèse protéique si les apports totaux sont insuffisants."},
+
 ];
 
 
@@ -559,7 +616,7 @@ function answer(chosen) {
 
   // explication
   const expl = document.getElementById('q-expl');
-  expl.innerHTML = (correct ? '✅ ' : '❌ ') + q.e;
+  expl.innerHTML = (correct ? '✅ ' : '❌ ') + q.e + '<br><button class="esm-btn" onclick="openESM()">📖 En savoir plus</button>';
   expl.className = 'explanation visible';
 
   // next
@@ -787,6 +844,61 @@ document.getElementById("install-btn").addEventListener("click",()=>{
     });
   }
 });
+</script>
+<script>
+/* ══ EN SAVOIR PLUS — Claude API ══ */
+let esmCurrentQ = null;
+
+function openESM() {
+  const q = session.questions[session.idx];
+  if (!q) return;
+  esmCurrentQ = q;
+  document.getElementById("esm-overlay").classList.add("open");
+  document.getElementById("esm-title").textContent = "En savoir plus";
+  document.getElementById("esm-body").innerHTML = '<div class="esm-loading"><div class="esm-spinner"></div>Génération en cours…</div>';
+  fetchESM(q);
+}
+
+function closeESM(e) {
+  if (e.target === document.getElementById("esm-overlay")) closeESMBtn();
+}
+function closeESMBtn() {
+  document.getElementById("esm-overlay").classList.remove("open");
+}
+
+async function fetchESM(q) {
+  const cats = {anat:"Anatomie / Biomécanique",physio:"Physiologie de l'effort",nutri:"Nutrition",regl:"Réglementation / Sécurité"};
+  const prompt = `Tu es un formateur expert CQP Instructeur Fitness.
+Question : "${q.q}"
+Bonne réponse : "${q.opts[q.r]}"
+Catégorie : ${cats[q.cat]}
+
+Génère une explication pédagogique approfondie en HTML simple (h3, p, ul/li uniquement, pas de markdown).
+Inclus :
+1. Explication détaillée du concept (3-5 phrases)
+2. Un schéma SVG pédagogique (viewBox="0 0 300 180", couleurs #2563eb #10b981 #f59e0b, fond #f8fafc, texte lisible)
+3. Un point "À retenir pour l'exam" en gras
+
+HTML uniquement, pas de backticks, pas de bloc de code.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{role: "user", content: prompt}]
+      })
+    });
+    const data = await res.json();
+    const html = data.content && data.content[0] ? data.content[0].text : "Erreur de génération.";
+    document.getElementById("esm-body").innerHTML = html;
+  } catch(e) {
+    document.getElementById("esm-body").innerHTML = "<p>Erreur de connexion.</p>";
+  }
+}
+
 </script>
 </body>
 </html>
