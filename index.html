@@ -162,7 +162,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 314 questions • UC3 • v2.3.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 314 questions • UC3 • v2.4.0</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v2.3.0 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v2.4.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -657,34 +657,36 @@ let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
 
 
 function forceUpdate() {
-  // Sauvegarder les scores AVANT tout nettoyage
-  const backup = localStorage.getItem(STORAGE_KEY);
-
-  const doReload = () => {
-    // Restaurer les scores si le reload les a effacés
-    if (backup && !localStorage.getItem(STORAGE_KEY)) {
-      localStorage.setItem(STORAGE_KEY, backup);
-    }
-    window.location.reload();
-  };
+  // 1. Sauvegarder dans sessionStorage ET localStorage
+  //    sessionStorage survit aux reloads même si localStorage est effacé
+  const data = JSON.stringify(scores);
+  try { localStorage.setItem(STORAGE_KEY, data); } catch(e) {}
+  try { sessionStorage.setItem(STORAGE_KEY + '_bak', data); } catch(e) {}
 
   if ('serviceWorker' in navigator) {
-    // Ne vider QUE le cache SW, pas localStorage
     caches.keys()
       .then(keys => Promise.all(keys.map(k => caches.delete(k))))
-      .then(() => {
-        navigator.serviceWorker.getRegistrations()
-          .then(regs => Promise.all(regs.map(r => r.unregister())))
-          .then(doReload);
-      });
+      .then(() => navigator.serviceWorker.getRegistrations())
+      .then(regs => Promise.all(regs.map(r => r.unregister())))
+      .then(() => window.location.reload());
   } else {
-    doReload();
+    window.location.reload();
   }
 }
 
 function loadScores() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    // Si localStorage vide (effacé par Chrome Android PWA au reload),
+    // restaurer depuis sessionStorage (backup de sécurité)
+    if (!raw) {
+      const bak = sessionStorage.getItem(STORAGE_KEY + '_bak');
+      if (bak) {
+        raw = bak;
+        localStorage.setItem(STORAGE_KEY, bak); // restaurer
+        console.log('Scores restaurés depuis sessionStorage');
+      }
+    }
     if (raw) scores = JSON.parse(raw);
   } catch(e) { scores = {}; }
   // init missing
@@ -692,7 +694,11 @@ function loadScores() {
 }
 
 async function saveScores() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
+  try {
+    const d = JSON.stringify(scores);
+    localStorage.setItem(STORAGE_KEY, d);
+    sessionStorage.setItem(STORAGE_KEY + '_bak', d);
+  } catch(e) {}
 }
 
 function getWeight(qid) {
@@ -1029,7 +1035,11 @@ function showScreen(id) {
 
 // Sauvegarde de sécurité avant fermeture/reload
 window.addEventListener('beforeunload', () => {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
+  try {
+    const d = JSON.stringify(scores);
+    localStorage.setItem(STORAGE_KEY, d);
+    sessionStorage.setItem(STORAGE_KEY + '_bak', d);
+  } catch(e) {}
 });
 
 loadScores();
