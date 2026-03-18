@@ -169,7 +169,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 165 questions • UC3 officiel</p>
+    <p class="app-sub">S'adapte à tes lacunes • 165 questions • UC3 • v1.4.0</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -194,6 +194,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 <button class="start-btn start-all" onclick="startSession('all')">▶ Session adaptative (10 q.)</button>
     <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff;margin-bottom:8px" onclick="startExamMode()">🎓 Mode Examen UC3 (60 q. / 30 min)</button>
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
+  </div>
+  <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
+    v1.4.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -845,9 +848,14 @@ if("serviceWorker" in navigator){
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js")
       .then(r => {
-        // Quand un nouveau SW prend le contrôle → rechargement automatique
+        const el = document.getElementById('sw-status');
+        if (el) el.textContent = '✅ à jour';
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           window.location.reload();
+        });
+        if (r.waiting && el) el.textContent = '🔄 maj dispo — appuie sur Forcer MAJ';
+        r.addEventListener('updatefound', () => {
+          if (el) el.textContent = '🔄 maj dispo — appuie sur Forcer MAJ';
         });
       })
       .catch(e => console.log("SW error", e));
