@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>QCM CQP IF</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#2563eb"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="QCM CQP"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<style>
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #e8eef5;
+  --border: #d0dcea;
+  --text: #0f1f33;
+  --muted: #6b7f96;
+  --accent: #2563eb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --orange: #d97706;
+  --purple: #7c3aed;
+  --font: 'Segoe UI', system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;touch-action:manipulation}
+
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;height:100vh;padding:0}
+.screen.active{display:flex}
+
+/* ── HOME ── */
+#home{padding:28px 20px 20px;justify-content:space-between}
+.home-top{}
+.app-eyebrow{font-size:10px;letter-spacing:.2em;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.app-title{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
+.app-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center}
+.stat-num{font-size:22px;font-weight:800;line-height:1}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+
+.subject-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.subj-btn{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;cursor:pointer;transition:border-color .15s;width:100%}
+.subj-btn:active{transform:scale(.98)}
+.subj-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.subj-info{flex:1;text-align:left}
+.subj-name{font-size:14px;font-weight:600}
+.subj-count{font-size:11px;color:var(--muted);margin-top:1px}
+.subj-bar-wrap{width:52px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.subj-bar{height:100%;border-radius:3px;transition:width .4s}
+
+.start-btn{width:100%;padding:18px;background:var(--accent);border:none;border-radius:16px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:-.01em;transition:opacity .15s}
+.start-btn:active{opacity:.85}
+.start-all{margin-bottom:10px}
+.start-weak{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+
+/* ── QUIZ ── */
+#quiz{padding:0;justify-content:space-between}
+.quiz-header{padding:16px 18px 12px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.back-btn{width:36px;height:36px;background:var(--surface);border:none;border-radius:10px;color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quiz-prog-wrap{flex:1}
+.quiz-prog-label{font-size:11px;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between}
+.quiz-prog-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.quiz-prog-fill{height:100%;border-radius:3px;background:var(--accent);transition:width .3s ease}
+.quiz-score-badge{font-size:12px;font-weight:700;color:var(--green);white-space:nowrap}
+
+.quiz-body{flex:1;overflow-y:auto;padding:20px 18px}
+.question-meta{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.q-tag{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.q-diff{font-size:10px;color:var(--muted)}
+.question-text{font-size:17px;font-weight:600;line-height:1.5;margin-bottom:22px;letter-spacing:-.01em}
+
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;padding:16px 15px;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:all .12s;width:100%;text-align:left}
+.opt:active{transform:scale(.99)}
+.opt-letter{width:30px;height:30px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .12s}
+.opt-text{font-size:14px;line-height:1.4;font-weight:500}
+.opt.selected{border-color:var(--accent);background:#dbeafe}
+.opt.selected .opt-letter{background:var(--accent);color:#fff}
+.opt.correct{border-color:var(--green);background:#dcfce7}
+.opt.correct .opt-letter{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:#fee2e2}
+.opt.wrong .opt-letter{background:var(--red);color:#fff}
+.opt.show-correct{border-color:var(--green);background:#dcfce7}
+.opt.show-correct .opt-letter{background:var(--green);color:#fff}
+.opt[disabled]{cursor:default}
+
+.explanation{margin-top:16px;background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:13px;line-height:1.65;color:#94a3b8;display:none}
+.explanation.visible{display:block}
+.explanation strong{color:var(--text)}
+
+.quiz-footer{padding:14px 18px 24px;border-top:1px solid var(--border);display:flex;gap:10px}
+.next-btn{flex:1;padding:16px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:opacity .15s}
+.next-btn.visible{display:block}
+.next-btn:active{opacity:.85}
+.flag-btn{width:50px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.flag-btn.flagged{border-color:var(--orange);color:var(--orange)}
+
+/* ── RESULT ── */
+#result{padding:24px 20px;justify-content:space-between;overflow-y:auto}
+.result-header{text-align:center;margin-bottom:24px}
+.result-emoji{font-size:52px;margin-bottom:12px}
+.result-title{font-size:24px;font-weight:800;margin-bottom:6px}
+.result-sub{font-size:13px;color:var(--muted)}
+.score-circle{width:90px;height:90px;border-radius:50%;border:4px solid var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;flex-direction:column}
+.score-pct{font-size:26px;font-weight:800}
+.score-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.rs-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.rs-num{font-size:20px;font-weight:800}
+.rs-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+
+.weak-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:20px}
+.weak-title{font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px}
+.weak-item{font-size:12px;color:#94a3b8;padding:5px 0;border-bottom:1px solid var(--border);line-height:1.4}
+.weak-item:last-child{border-bottom:none}
+
+.result-btns{display:flex;flex-direction:column;gap:8px}
+
+/* ── COLORS ── */
+.c-anat{color:#3b82f6}.c-physio{color:#10b981}.c-nutri{color:#f59e0b}.c-regl{color:#a855f7}
+.bg-anat{background:#3b82f6}.bg-physio{background:#10b981}.bg-nutri{background:#f59e0b}.bg-regl{background:#a855f7}
+.tag-anat{background:#dbeafe;color:#1d4ed8}
+.tag-physio{background:#dcfce7;color:#15803d}
+.tag-nutri{background:#fef3c7;color:#b45309}
+.tag-regl{background:#ede9fe;color:#6d28d9}
+</style>
+</head>
+<body>
+
+<!-- ═══ HOME ═══ -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
+    <h1 class="app-title">Révision<br/>Intelligente</h1>
+    <p class="app-sub">S'adapte à tes lacunes • 147 questions • UC3 officiel</p>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="st-done">0</div>
+        <div class="stat-lbl">Questions vues</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="st-pct" style="color:var(--green)">—</div>
+        <div class="stat-lbl">Taux réussite</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="st-weak" style="color:var(--orange)">0</div>
+        <div class="stat-lbl">À retravailler</div>
+      </div>
+    </div>
+
+    <div class="subject-list" id="subject-list"></div>
+  </div>
+
+  <div>
+    <button class="start-btn start-all" onclick="startSession('all')">▶ Session adaptative (10 q.)</button>
+    <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff;margin-bottom:8px" onclick="startExamMode()">🎓 Mode Examen UC3 (60 q. / 30 min)</button>
+    <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
+  </div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div id="quiz" class="screen">
+  <div class="quiz-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div class="quiz-prog-wrap">
+      <div class="quiz-prog-label">
+        <span id="q-num">Question 1 / 10</span>
+        <span id="q-streak"></span>
+      </div>
+      <div class="quiz-prog-bar"><div class="quiz-prog-fill" id="q-prog" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-score-badge" id="q-score">0 ✓</div>
+  </div>
+
+  <div class="quiz-body">
+    <div class="question-meta">
+      <span class="q-tag" id="q-tag-label">Anatomie</span>
+      <span class="q-diff" id="q-diff"></span>
+    </div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-opts"></div>
+    <div class="explanation" id="q-expl"></div>
+  </div>
+
+  <div class="quiz-footer">
+    <button class="flag-btn" id="flag-btn" onclick="toggleFlag()" title="Marquer">🚩</button>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Question suivante →</button>
+  </div>
+</div>
+
+<!-- ═══ RESULT ═══ -->
+<div id="result" class="screen">
+  <div class="result-header">
+    <div class="result-emoji" id="r-emoji">🎯</div>
+    <h2 class="result-title" id="r-title">Session terminée !</h2>
+    <p class="result-sub" id="r-sub"></p>
+  </div>
+  <div class="score-circle">
+    <div class="score-pct" id="r-pct">0%</div>
+    <div class="score-lbl">Score</div>
+  </div>
+  <div class="result-stats">
+    <div class="rs-box"><div class="rs-num" id="r-correct" style="color:var(--green)">0</div><div class="rs-lbl">Correctes</div></div>
+    <div class="rs-box"><div class="rs-num" id="r-wrong" style="color:var(--red)">0</div><div class="rs-lbl">Erreurs</div></div>
+    <div class="rs-box"><div class="rs-num" id="r-flags" style="color:var(--orange)">0</div><div class="rs-lbl">Marquées</div></div>
+  </div>
+  <div class="weak-section" id="r-weak-section">
+    <div class="weak-title">⚠ À retravailler</div>
+    <div id="r-weak-list"></div>
+  </div>
+  <div class="result-btns">
+    <button class="start-btn" onclick="startSession('all')">▶ Session adaptative</button>
+    <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff" onclick="startExamMode()">🎓 Repasser l'UC3 (60 q.)</button>
+    <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes</button>
+    <button class="start-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="goHome()">← Accueil</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// QUESTIONS — 107 questions CQP IF UC3
+// UC3 RÉEL : 60 questions / 30 min — 20 anat + 20 physio + 20 nutri
+// Seuil de validation : 15/20 par domaine
+// ══════════════════════════════════════════════════════
+const QDB = [
+
+// ─── ANATOMIE / BIOMÉCANIQUE ──────────────────────────
+{id:"a1",cat:"anat",q:"Quel muscle est le principal extenseur de la hanche ?",opts:["Quadriceps","Grand fessier","Ischio-jambiers","Soléaire"],r:1,e:"Le <strong>grand fessier</strong> est le principal extenseur et rotateur externe de la hanche. Les ischio-jambiers participent aussi à l'extension, mais en secondaire."},
+{id:"a2",cat:"anat",q:"Dans quel plan anatomique se déroule un mouvement de flexion-extension ?",opts:["Plan frontal","Plan transversal","Plan sagittal","Plan coronal"],r:2,e:"La flexion et l'extension se déroulent dans le <strong>plan sagittal</strong> (plan médian, coupe gauche/droite), autour d'un axe transversal."},
+{id:"a3",cat:"anat",q:"Quelle articulation permet l'abduction du bras ?",opts:["Coude","Épaule (gléno-humérale)","Poignet","Sternoclaviculaire"],r:1,e:"L'<strong>articulation gléno-humérale</strong> (épaule) est la plus mobile du corps et permet l'abduction. Le deltoïde moyen en est le moteur principal."},
+{id:"a4",cat:"anat",q:"Le biceps brachial est qualifié de biarticulaire car il croise :",opts:["Le coude et le poignet","L'épaule et le coude","L'épaule uniquement","Le coude uniquement"],r:1,e:"Le biceps brachial croise <strong>l'épaule ET le coude</strong>, ce qui lui confère une action de flexion du coude ET de légère flexion de l'épaule. Il peut souffrir d'insuffisance active."},
+{id:"a5",cat:"anat",q:"Lors d'un squat, quelle contraction effectuent les quadriceps à la descente ?",opts:["Concentrique","Isométrique","Excentrique","Isocinétique"],r:2,e:"À la descente du squat, les quadriceps <strong>s'allongent tout en développant une tension</strong> pour freiner le mouvement : c'est une contraction <strong>excentrique</strong>."},
+{id:"a6",cat:"anat",q:"Quel muscle est responsable de l'adduction et de l'extension de l'humérus ?",opts:["Deltoïde","Grand pectoral","Grand dorsal","Trapèze"],r:2,e:"Le <strong>grand dorsal</strong> est le principal adducteur et extenseur de l'humérus. Il est aussi rotateur interne. Il est fortement sollicité au tirage vertical et à la traction."},
+{id:"a7",cat:"anat",q:"L'abduction se déroule dans quel plan ?",opts:["Plan sagittal","Plan frontal","Plan transversal","Plan horizontal"],r:1,e:"L'abduction (éloignement du membre de l'axe du corps) se déroule dans le <strong>plan frontal</strong>, autour d'un axe antéro-postérieur."},
+{id:"a8",cat:"anat",q:"Quelle est l'action principale du soléaire ?",opts:["Flexion dorsale de la cheville","Flexion plantaire de la cheville","Extension du genou","Abduction de la hanche"],r:1,e:"Le <strong>soléaire</strong> est un fléchisseur plantaire de la cheville. Contrairement au gastrocnémien, il n'est pas biarticulaire → il est isolé lorsque le genou est fléchi (mollet assis)."},
+{id:"a9",cat:"anat",q:"Le levier de 3e genre est le plus fréquent dans le corps humain. Quelle est sa caractéristique ?",opts:["Bras moteur > bras résistant (favorable en force)","Force entre l'axe et la résistance (favorable en vitesse)","Résistance entre l'axe et la force","Axe entre force et résistance"],r:1,e:"Dans le levier de <strong>3e genre</strong>, la force musculaire est appliquée <strong>entre l'axe articulaire et la résistance</strong>. Cela est défavorable en force mais favorable en vitesse et en amplitude."},
+{id:"a10",cat:"anat",q:"Quel muscle réalise l'extension du coude ?",opts:["Biceps brachial","Brachioradial","Triceps brachial","Brachial"],r:2,e:"Le <strong>triceps brachial</strong> (3 chefs) est le seul extenseur du coude. Son chef long est biarticulaire. Il est sollicité au développé couché, dips, poulie haute."},
+{id:"a11",cat:"anat",q:"Quelle est la fonction principale du transverse de l'abdomen ?",opts:["Flexion du tronc","Rotation du tronc","Stabilisation et gainage profond","Extension du rachis"],r:2,e:"Le <strong>transverse de l'abdomen</strong> est le muscle le plus profond des abdominaux. Sa contraction augmente la pression intra-abdominale, assurant une <strong>ceinture naturelle de protection</strong> des lombaires."},
+{id:"a12",cat:"anat",q:"Lors d'un curl biceps, quel rôle jouent les triceps ?",opts:["Agoniste","Antagoniste","Synergiste","Fixateur"],r:1,e:"Au curl biceps (flexion du coude), les triceps sont les <strong>antagonistes</strong> : ils s'allongent de manière excentrique pour contrôler le mouvement et stabiliser l'articulation."},
+{id:"a13",cat:"anat",q:"Le gastrocnémien est biarticulaire car il croise :",opts:["La hanche et le genou","Le genou et la cheville","La cheville et le pied","La hanche et la cheville"],r:1,e:"Le <strong>gastrocnémien</strong> croise le genou (flexion) et la cheville (flexion plantaire). Il est donc moins efficace en flexion plantaire quand le genou est fléchi (insuffisance active) → le soléaire prend le relais."},
+{id:"a14",cat:"anat",q:"Quelle structure transmet la force musculaire à l'os ?",opts:["Le ligament","L'aponévrose","Le tendon","Le cartilage"],r:2,e:"Le <strong>tendon</strong> est la structure fibreuse qui relie le muscle à l'os et transmet la force de contraction. Les ligaments relient os à os et stabilisent les articulations."},
+{id:"a15",cat:"anat",q:"Lors du développé couché, quel faisceau du pectoral est prioritairement sollicité en incliné positif ?",opts:["Faisceau sternal","Faisceau abdominal","Faisceau claviculaire","Faisceau costal"],r:2,e:"L'incliné positif oriente la charge vers la partie haute du pectoral : le <strong>faisceau claviculaire</strong> est préférentiellement sollicité."},
+{id:"a16",cat:"anat",q:"Qu'est-ce que l'insuffisance active d'un muscle biarticulaire ?",opts:["Le muscle est trop court pour s'étirer","Le muscle ne peut plus se raccourcir davantage car déjà raccourci aux deux extrémités","Le muscle n'a pas assez de force","Le muscle est blessé"],r:1,e:"L'<strong>insuffisance active</strong> se produit quand un muscle biarticulaire est <strong>raccourci simultanément aux deux articulations</strong> qu'il contrôle → il ne peut plus développer une force optimale. Ex: leg curl avec hanche fléchie."},
+{id:"a17",cat:"anat",q:"Quel groupe musculaire est antagoniste aux quadriceps pour le mouvement de genou ?",opts:["Les fessiers","Les adducteurs","Les ischio-jambiers","Le soléaire"],r:2,e:"Les <strong>ischio-jambiers</strong> fléchissent le genou, action inverse des quadriceps (extenseurs). Ce sont donc les antagonistes directs pour le mouvement de genou."},
+{id:"a18",cat:"anat",q:"Le mouvement de rotation interne/externe se produit dans quel plan ?",opts:["Plan sagittal","Plan frontal","Plan transversal","Plan coronal"],r:2,e:"Les rotations (interne et externe) se déroulent dans le <strong>plan transversal</strong> (horizontal), autour d'un axe longitudinal (vertical)."},
+
+// ─── PHYSIOLOGIE DE L'EFFORT ──────────────────────────
+{id:"p1",cat:"physio",q:"Quelle filière énergétique est sollicitée en premier lors d'un effort intense et court (< 8 sec) ?",opts:["Glycolytique anaérobie","Aérobie","Phosphocréatine (ATP-CP)","Lipolyse"],r:2,e:"La filière <strong>phosphocréatine (ATP-CP)</strong> est immédiatement disponible, sans oxygène, sans lactate. Elle dure 6-10 secondes. C'est la filière des sprints et des mouvements explosifs."},
+{id:"p2",cat:"physio",q:"Quelle est la valeur approximative de la VO2max chez un adulte sédentaire moyen ?",opts:["20-25 mL/kg/min","35-45 mL/kg/min","55-65 mL/kg/min","70-80 mL/kg/min"],r:1,e:"Un adulte sédentaire a une <strong>VO2max d'environ 35-45 mL/kg/min</strong>. Un athlète de haut niveau peut atteindre 70-85 mL/kg/min. Elle diminue avec l'âge et l'inactivité."},
+{id:"p3",cat:"physio",q:"Qu'est-ce que le seuil lactique (seuil 1) ?",opts:["Intensité à laquelle le lactate chute brutalement","Intensité à partir de laquelle la concentration de lactate sanguin commence à augmenter significativement","Intensité maximale tolérable","La VO2max divisée par 2"],r:1,e:"Le <strong>seuil lactique</strong> (SL1) est le point à partir duquel la production de lactate dépasse la capacité d'élimination. C'est la limite entre travail aérobie léger et modéré. Il se situe généralement à 60-70% de la VO2max."},
+{id:"p4",cat:"physio",q:"Quel phénomène explique les DOMS (courbatures) ?",opts:["Accumulation d'acide lactique","Micro-lésions des fibres musculaires dues aux contractions excentriques","Déshydratation","Manque d'oxygène pendant l'effort"],r:1,e:"Les <strong>DOMS</strong> (Delayed Onset Muscle Soreness) sont causés par des <strong>micro-lésions musculaires</strong>, principalement lors des contractions excentriques. L'acide lactique est éliminé en quelques heures après l'effort."},
+{id:"p5",cat:"physio",q:"Lors d'un effort aérobie, quelle molécule est le principal substrat énergétique en début d'effort ?",opts:["Les lipides","Les protéines","Le glycogène (glucides)","La créatine"],r:2,e:"En début d'effort aérobie, le <strong>glycogène musculaire (glucides)</strong> est le substrat préférentiel. Avec la durée et à faible intensité, la part des lipides augmente progressivement."},
+{id:"p6",cat:"physio",q:"Qu'est-ce que l'hypertrophie musculaire ?",opts:["Augmentation du nombre de fibres musculaires","Augmentation du volume des fibres musculaires existantes","Diminution du tissu adipeux","Augmentation de la vascularisation"],r:1,e:"L'<strong>hypertrophie</strong> est l'augmentation du <strong>volume des fibres musculaires</strong> (myofibrilles, protéines contractiles). Le nombre de fibres (hyperplasie) est très limité chez l'humain."},
+{id:"p7",cat:"physio",q:"Quelle est la fréquence cardiaque maximale théorique d'une personne de 30 ans (formule de base) ?",opts:["150 bpm","180 bpm","190 bpm","200 bpm"],r:2,e:"La formule classique est <strong>FCmax = 220 - âge</strong>. Pour 30 ans : 220 - 30 = <strong>190 bpm</strong>. La formule de Tanaka (209 - 0,7×âge) est plus précise pour les sujets entraînés."},
+{id:"p8",cat:"physio",q:"Quelles fibres musculaires sont prépondérantes pour les efforts de force et d'explosivité ?",opts:["Fibres de type I (lentes)","Fibres de type IIa","Fibres de type IIx (rapides)","Fibres intermédiaires"],r:2,e:"Les <strong>fibres de type IIx</strong> (anciennement IIb) sont les plus rapides, les plus puissantes et les plus fatigables. Elles sont sollicitées lors des efforts explosifs, sprints et charges lourdes."},
+{id:"p9",cat:"physio",q:"Qu'est-ce que la surcompensation ?",opts:["Une blessure liée à l'excès d'entraînement","La phase de superadaptation après la récupération, où les capacités dépassent le niveau initial","L'accumulation de fatigue chronique","Un trouble nutritionnel"],r:1,e:"La <strong>surcompensation</strong> est le principe fondamental de l'entraînement : après un stimulus et une récupération adéquate, l'organisme s'adapte à un niveau <strong>supérieur</strong> au niveau initial."},
+{id:"p10",cat:"physio",q:"La FC de réserve se calcule ainsi :",opts:["FCmax - FC repos","FCmax × 0,75","FC repos × 2","FCmax + FC repos / 2"],r:0,e:"La <strong>FC de réserve = FCmax - FC repos</strong>. Elle est utilisée dans la méthode de Karvonen pour calculer les zones d'entraînement : FC cible = FC repos + (FC réserve × % intensité)."},
+{id:"p11",cat:"physio",q:"Combien de temps faut-il environ pour resynthétiser le glycogène musculaire après un effort intense ?",opts:["30 minutes","2-3 heures","24-48 heures","1 semaine"],r:2,e:"La resynthèse complète du glycogène musculaire prend <strong>24 à 48 heures</strong> selon l'intensité de l'effort et les apports en glucides. Consommer des glucides dans les 30 min post-effort accélère ce processus (fenêtre métabolique)."},
+{id:"p12",cat:"physio",q:"Qu'est-ce que l'effet EPOC (Excess Post-exercise Oxygen Consumption) ?",opts:["Diminution de la VO2 après l'effort","Augmentation de la consommation d'oxygène après l'effort pour restaurer l'homéostasie","Pic de VO2 en fin d'exercice","Récupération du glycogène"],r:1,e:"L'<strong>EPOC</strong> (dette d'oxygène) est l'<strong>augmentation de la consommation d'O₂ après l'effort</strong> pour restaurer les phosphagènes, éliminer le lactate, réguler la température. Les efforts HIIT génèrent un EPOC important."},
+{id:"p13",cat:"physio",q:"Le principe de progressivité en musculation signifie :",opts:["Augmenter les charges chaque semaine sans exception","Augmenter progressivement les charges/volume/intensité pour continuer à progresser","S'entraîner de plus en plus longtemps","Ne jamais faire la même séance deux fois"],r:1,e:"La <strong>progressivité</strong> (overload progressif) stipule qu'il faut <strong>augmenter régulièrement le stimulus</strong> (charges, volume, densité, amplitude) pour maintenir une adaptation. Sans progression, le corps s'adapte et stagne."},
+{id:"p14",cat:"physio",q:"Les fibres de type I sont caractérisées par :",opts:["Contraction rapide, forte puissance, fatigabilité élevée","Contraction lente, résistance à la fatigue, métabolisme aérobie dominant","Contraction rapide, glycolytique, peu de mitochondries","Grande taille, forte puissance, peu d'endurance"],r:1,e:"Les fibres <strong>type I</strong> (lentes, rouges) sont <strong>résistantes à la fatigue</strong>, riches en mitochondries et myoglobine, à dominante aérobie. Elles sont sollicitées en premier lors de tout effort et prédominantes chez les fondeurs."},
+{id:"p15",cat:"physio",q:"Quel effet a l'entraînement aérobie régulier sur la fréquence cardiaque de repos ?",opts:["Elle augmente","Elle reste stable","Elle diminue","Elle devient irrégulière"],r:2,e:"L'entraînement aérobie provoque une <strong>bradycardie de repos</strong> (FC repos diminuée). Le cœur éjecte un plus grand volume par battement (volume d'éjection augmenté) → besoin de moins de battements pour le même débit."},
+{id:"p16",cat:"physio",q:"Quel est l'effet principal d'une charge d'entraînement trop élevée sans récupération adéquate ?",opts:["Surcompensation accélérée","Surentraînement (overtraining)","Augmentation de la VO2max","Hypertrophie accélérée"],r:1,e:"Sans récupération adéquate, les charges excessives mènent au <strong>surentraînement</strong> : régression des performances, fatigue chronique, troubles du sommeil, irritabilité, susceptibilité aux blessures."},
+{id:"p17",cat:"physio",q:"Lors d'un exercice maximal, quel pourcentage approximatif de la VO2max représente le seuil anaérobie ?",opts:["40-50%","55-65%","75-90%","95-100%"],r:2,e:"Le <strong>seuil anaérobie</strong> (SL2 ou seuil ventilatoire 2) se situe généralement entre <strong>75 et 90% de la VO2max</strong> selon le niveau d'entraînement. Plus l'athlète est entraîné, plus ce seuil est élevé."},
+
+// ─── NUTRITION ────────────────────────────────────────
+{id:"n1",cat:"nutri",q:"Combien de kilocalories apporte 1 gramme de protéines ?",opts:["4 kcal","7 kcal","9 kcal","2 kcal"],r:0,e:"Les <strong>protéines apportent 4 kcal/g</strong>, comme les glucides (4 kcal/g). Les lipides apportent 9 kcal/g. L'alcool apporte 7 kcal/g (non nutritif)."},
+{id:"n2",cat:"nutri",q:"Quel est l'apport protéique recommandé pour un pratiquant de musculation souhaitant prendre de la masse ?",opts:["0,8 g/kg/jour","1,2-1,5 g/kg/jour","1,6-2,2 g/kg/jour","3-4 g/kg/jour"],r:2,e:"Les recommandations actuelles pour l'<strong>hypertrophie musculaire</strong> sont de <strong>1,6 à 2,2 g/kg/jour</strong> de protéines (ISSN, ACSM). Au-delà de 2,2 g/kg, l'effet sur l'hypertrophie est marginal."},
+{id:"n3",cat:"nutri",q:"Quelle est la fenêtre métabolique post-effort recommandée pour optimiser la récupération ?",opts:["Immédiatement après uniquement","Dans les 30 à 60 minutes après l'effort","12 heures après","Le lendemain matin uniquement"],r:1,e:"La <strong>fenêtre métabolique</strong> (30-60 min post-effort) est la période où la sensibilité à l'insuline est maximale et la resynthèse du glycogène est la plus rapide. Un repas mixte protéines + glucides est idéal."},
+{id:"n4",cat:"nutri",q:"Les acides aminés essentiels (AAE) sont :",opts:["Synthétisés par l'organisme en quantité suffisante","Apportés uniquement par les suppléments","Non synthétisables par l'organisme, devant être apportés par l'alimentation","Présents uniquement dans les protéines animales"],r:2,e:"Les <strong>acides aminés essentiels</strong> ne peuvent pas être synthétisés par l'organisme en quantité suffisante → ils doivent être apportés par l'alimentation. Il en existe 9 (histidine, isoleucine, leucine, lysine, méthionine, phénylalanine, thréonine, tryptophane, valine)."},
+{id:"n5",cat:"nutri",q:"Quelle est la principale source d'énergie pour le cerveau ?",opts:["Les lipides","Les protéines","Le glucose","Les corps cétoniques"],r:2,e:"Le <strong>glucose</strong> est le carburant préférentiel du cerveau. En cas de jeûne prolongé, le cerveau peut partiellement utiliser des corps cétoniques, mais il dépend structurellement du glucose."},
+{id:"n6",cat:"nutri",q:"Combien de kilocalories apporte 1 gramme de lipides ?",opts:["4 kcal","7 kcal","9 kcal","11 kcal"],r:2,e:"Les <strong>lipides apportent 9 kcal/g</strong>, soit plus du double des protéines et glucides (4 kcal/g). Ils sont la forme de stockage énergétique la plus dense de l'organisme."},
+{id:"n7",cat:"nutri",q:"L'index glycémique (IG) mesure :",opts:["La teneur en sucre d'un aliment","La vitesse et l'amplitude de la hausse de la glycémie après consommation d'un aliment","La quantité de calories d'un aliment","La teneur en fibres d'un aliment"],r:1,e:"L'<strong>index glycémique</strong> mesure la capacité d'un aliment à élever la glycémie par rapport à un aliment de référence (glucose ou pain blanc = 100). Un IG élevé = pic glycémique rapide."},
+{id:"n8",cat:"nutri",q:"Quelle vitamine est synthétisée par la peau sous l'action des UV ?",opts:["Vitamine C","Vitamine B12","Vitamine D","Vitamine K"],r:2,e:"La <strong>vitamine D</strong> (cholécalciférol) est synthétisée dans la peau par exposition aux UVB. Elle joue un rôle crucial dans l'absorption du calcium, la santé osseuse et la fonction musculaire."},
+{id:"n9",cat:"nutri",q:"Un excès calorique de 7700 kcal correspond approximativement à :",opts:["100 g de graisse","500 g de graisse","1 kg de graisse","2 kg de graisse"],r:2,e:"Il faut environ <strong>7700 kcal d'excès</strong> pour stocker <strong>1 kg de graisse</strong>. À l'inverse, un déficit de 7700 kcal est nécessaire pour perdre 1 kg de masse grasse (théorique, en pratique variable selon l'individu)."},
+{id:"n10",cat:"nutri",q:"Quelle est la recommandation quotidienne en eau pour un adulte actif ?",opts:["1 litre","1,5 litre","2 à 3 litres (+ pertes sudorales)","5 litres"],r:2,e:"Un adulte actif doit consommer <strong>2 à 3 litres d'eau par jour</strong>, auxquels s'ajoutent les pertes sudorales liées à l'effort (0,5 à 2 L/h selon l'intensité et la chaleur). La soif est déjà un signe de déshydratation légère."},
+{id:"n11",cat:"nutri",q:"Les BCAA (acides aminés branchés) sont :",opts:["Leucine, Isoleucine, Valine","Glutamine, Arginine, Lysine","Méthionine, Tryptophane, Phénylalanine","Tous les acides aminés essentiels"],r:0,e:"Les <strong>BCAA</strong> sont la <strong>Leucine, l'Isoleucine et la Valine</strong>. La leucine est le signal principal de la synthèse protéique (mTOR). Ils sont particulièrement présents dans les protéines de lactosérum (whey)."},
+{id:"n12",cat:"nutri",q:"En période de prise de masse, quelle macronutrition est généralement recommandée ?",opts:["Déficit calorique + protéines élevées","Surplus calorique modéré (5-10%) + protéines élevées + glucides suffisants","Surplus calorique maximal + lipides élevés","Même apport que la maintenance, juste plus de protéines"],r:1,e:"La prise de masse optimale repose sur un <strong>surplus calorique modéré</strong> (5-10% au-dessus de la maintenance) avec des <strong>protéines élevées</strong> (1,8-2,2 g/kg) et suffisamment de glucides pour alimenter les séances."},
+{id:"n13",cat:"nutri",q:"Quel minéral est indispensable à la contraction musculaire et à la transmission nerveuse ?",opts:["Fer","Magnésium","Calcium","Zinc"],r:2,e:"Le <strong>calcium</strong> est indispensable à la contraction musculaire (couplage excitation-contraction via la troponine). Le magnésium joue aussi un rôle important dans la relaxation musculaire et la synthèse d'ATP."},
+{id:"n14",cat:"nutri",q:"La créatine monohydrate est une aide ergogénique validée scientifiquement pour :",opts:["Les efforts aérobies longs","Les efforts de force courte durée et répétés (< 30 sec)","La perte de graisse","La récupération des blessures"],r:1,e:"La <strong>créatine monohydrate</strong> est l'aide ergogénique la mieux documentée. Elle augmente les stocks de phosphocréatine, améliorant la performance sur les efforts <strong>courts et intenses répétés</strong> (force, HIIT, sprints)."},
+{id:"n15",cat:"nutri",q:"Les acides gras oméga-3 (EPA/DHA) ont principalement un effet :",opts:["Anabolisant direct","Anti-inflammatoire et bénéfique sur la santé cardiovasculaire","Stimulant du système nerveux","Augmentation de la glycémie"],r:1,e:"Les <strong>oméga-3 (EPA/DHA)</strong> ont des effets <strong>anti-inflammatoires</strong> et cardioprotecteurs bien documentés. Ils peuvent aussi améliorer légèrement la sensibilité à l'insuline et réduire les douleurs musculaires post-effort."},
+{id:"n16",cat:"nutri",q:"Qu'est-ce que le métabolisme de base (MB) ?",opts:["Calories brûlées pendant une séance de sport","Énergie minimale nécessaire au maintien des fonctions vitales au repos","Énergie totale dépensée dans une journée","Énergie nécessaire à la digestion"],r:1,e:"Le <strong>métabolisme de base</strong> est l'énergie minimale que l'organisme consomme pour maintenir ses fonctions vitales (respiration, circulation, thermorégulation) <strong>au repos complet</strong>. Il représente 60-70% de la dépense énergétique totale."},
+{id:"n17",cat:"nutri",q:"Quel est le rôle des fibres alimentaires dans l'alimentation ?",opts:["Apporter de l'énergie rapide","Favoriser le transit intestinal et réguler la glycémie","Augmenter la masse musculaire","Synthétiser des hormones"],r:1,e:"Les <strong>fibres alimentaires</strong> favorisent le <strong>transit intestinal</strong>, régulent l'absorption des glucides (IG réduit), nourrissent le microbiote intestinal et contribuent à la satiété. Recommandation : 25-30 g/jour."},
+{id:"n18",cat:"nutri",q:"La whey protéine est particulièrement intéressante car :",opts:["Elle a le taux d'assimilation le plus lent","Elle est riche en leucine et a une assimilation rapide, idéale post-entraînement","Elle est la seule source complète de protéines","Elle remplace efficacement tous les repas"],r:1,e:"La <strong>whey</strong> (protéine de lactosérum) est riche en <strong>leucine</strong> (signal de synthèse protéique) et s'assimile rapidement. Elle est idéale en post-entraînement pour stimuler la synthèse protéique musculaire."},
+
+// ─── ANATOMIE — SQUELETTE & ARTICULATIONS ─────────────
+{id:"a19",cat:"anat",q:"Combien d'os compose le squelette adulte humain ?",opts:["106","206","306","256"],r:1,e:"Le squelette adulte humain est composé de <strong>206 os</strong>. Le nouveau-né en possède environ 270-350 (certains fusionnent avec la croissance, notamment les os du crâne et du bassin)."},
+{id:"a20",cat:"anat",q:"Quel type d'articulation est l'épaule (gléno-humérale) ?",opts:["Trochoïde (pivot)","Trochléenne (ginglyme)","Énarthrose (sphéroïde)","Arthrodie (plane)"],r:2,e:"L'épaule est une <strong>énarthrose</strong> (articulation sphéroïde = 'boule dans un bol'), ce qui lui confère la plus grande mobilité du corps humain : flexion/extension, abduction/adduction, rotation, circumduction."},
+{id:"a21",cat:"anat",q:"La colonne vertébrale comprend combien de vertèbres au total ?",opts:["24","33-34","26","30"],r:1,e:"La colonne vertébrale comprend <strong>33 à 34 vertèbres</strong> : 7 cervicales + 12 thoraciques + 5 lombaires + 5 sacrées (fusionnées = sacrum) + 4-5 coccygiennes (fusionnées = coccyx). Les vertèbres mobiles sont au nombre de 24."},
+{id:"a22",cat:"anat",q:"Quel os forme le genou avec le tibia et la fibula ?",opts:["Tibia seul","Fémur","Fémur + rotule (patella)","Péroné"],r:2,e:"Le genou (articulation du genou = gonarthrose) est formé par le <strong>fémur, le tibia et la rotule (patella)</strong>. C'est une articulation complexe (trochléenne + arthrodie) protégée par 2 ménisques et 4 ligaments principaux (LCA, LCP, LLI, LLE)."},
+{id:"a23",cat:"anat",q:"Quel est le rôle principal des ligaments ?",opts:["Relier le muscle à l'os","Relier deux os entre eux et stabiliser les articulations","Transmettre la force musculaire","Amortir les chocs articulaires"],r:1,e:"Les <strong>ligaments</strong> sont des structures fibreuses reliant <strong>os à os</strong>. Ils stabilisent les articulations et limitent les amplitudes excessives. Contrairement aux tendons qui relient muscle à os."},
+{id:"a24",cat:"anat",q:"Quel est le rôle du cartilage articulaire ?",opts:["Produire du liquide synovial","Relier les muscles aux os","Réduire les frictions et amortir les chocs entre les surfaces articulaires","Transmettre les signaux nerveux"],r:2,e:"Le <strong>cartilage articulaire</strong> (hyalin) recouvre les surfaces osseuses des articulations. Il <strong>réduit les frictions</strong> et amortit les chocs. Avasculaire, il se régénère très peu (d'où l'arthrose)."},
+{id:"a25",cat:"anat",q:"La coiffe des rotateurs comprend 4 muscles. Quel est leur rôle principal ?",opts:["Extension du coude","Stabilisation de la tête de l'humérus dans la glène","Abduction du bras","Flexion de l'épaule"],r:1,e:"Les 4 muscles de la <strong>coiffe des rotateurs</strong> (sus-épineux, sous-épineux, petit rond, sous-scapulaire) ont pour rôle principal de <strong>stabiliser la tête de l'humérus</strong> dans la glène scapulaire, évitant les subluxations."},
+
+// ─── PHYSIOLOGIE — SYSTÈME NERVEUX ────────────────────
+{id:"p18",cat:"physio",q:"Le système nerveux sympathique prépare l'organisme à l'effort. Quel est son effet sur la fréquence cardiaque ?",opts:["Il la diminue","Il l'augmente","Il n'a aucun effet","Il la régularise"],r:1,e:"Le système nerveux <strong>sympathique</strong> ('fight or flight') <strong>augmente la fréquence cardiaque</strong>, dilate les bronches, augmente la glycémie. Son neurotransmetteur principal est la <strong>noradrénaline</strong>. Le parasympathique fait l'inverse (repos/digestion)."},
+{id:"p19",cat:"physio",q:"Qu'est-ce qu'une jonction neuromusculaire ?",opts:["L'articulation entre deux muscles","La synapse entre un motoneurone et une fibre musculaire","La connexion entre deux neurones","Le point d'insertion du tendon sur l'os"],r:1,e:"La <strong>jonction neuromusculaire</strong> est la synapse spécialisée entre un motoneurone et une fibre musculaire. C'est là que l'acétylcholine est libérée pour déclencher la contraction musculaire."},
+{id:"p20",cat:"physio",q:"Quel est le rôle du fuseau neuromusculaire ?",opts:["Détecter la tension excessive du muscle (protection)","Détecter les changements de longueur musculaire (étirement)","Transmettre l'influx nerveux moteur","Stocker l'énergie"],r:1,e:"Le <strong>fuseau neuromusculaire</strong> est un propriocepteur qui détecte les <strong>changements de longueur du muscle</strong>. Il déclenche le réflexe myotatique (contraction réflexe en réponse à l'étirement). L'organe tendineux de Golgi, lui, détecte la tension excessive."},
+{id:"p21",cat:"physio",q:"Comment s'appelle la molécule produite lors de la contraction musculaire qui génère l'énergie ?",opts:["Créatine phosphate","Glucose","ATP (adénosine triphosphate)","AMP"],r:2,e:"L'<strong>ATP</strong> (adénosine triphosphate) est la molécule universelle d'énergie. La contraction musculaire consomme de l'ATP. Toutes les filières énergétiques ont pour but final de resynthétiser l'ATP."},
+
+// ─── PHYSIOLOGIE — SYSTÈME CARDIOVASCULAIRE ───────────
+{id:"p22",cat:"physio",q:"Comment se calcule le débit cardiaque (DC) ?",opts:["FC + VES","FC × VES","FC / VES","FC − VES"],r:1,e:"<strong>Débit cardiaque = FC × VES</strong> (Fréquence Cardiaque × Volume d'Éjection Systolique). Au repos ≈ 70 bpm × 70 mL = 5 L/min. À l'effort maximal, il peut atteindre 20-25 L/min chez un sportif entraîné."},
+{id:"p23",cat:"physio",q:"L'artère pulmonaire transporte du sang :",opts:["Riche en oxygène, du cœur gauche vers les poumons","Pauvre en oxygène, du cœur droit vers les poumons","Riche en oxygène, des poumons vers le cœur","Pauvre en oxygène, du cœur gauche vers les organes"],r:1,e:"L'<strong>artère pulmonaire</strong> transporte du sang <strong>pauvre en O₂</strong> (sang veineux) du <strong>ventricule droit vers les poumons</strong>. C'est l'exception : les artères ne transportent pas toujours du sang oxygéné — elles transportent du sang qui s'éloigne du cœur."},
+{id:"p24",cat:"physio",q:"Quelle adaptation cardiaque chronique résulte d'un entraînement aérobie régulier ?",opts:["Tachycardie de repos","Bradycardie de repos et augmentation du volume d'éjection","Augmentation permanente de la pression artérielle","Diminution du débit cardiaque"],r:1,e:"L'entraînement aérobie entraîne une <strong>bradycardie de repos</strong> (FC basse) et une <strong>augmentation du volume d'éjection systolique</strong> (cœur plus volumineux et puissant = 'cœur d'athlète'). Le débit cardiaque de repos reste stable car VES ↑ compense FC ↓."},
+{id:"p25",cat:"physio",q:"Quelle est la valeur normale de la fréquence cardiaque de repos chez l'adulte ?",opts:["30-50 bpm","60-80 bpm","90-110 bpm","120-140 bpm"],r:1,e:"La FC de repos normale chez l'adulte est de <strong>60 à 80 bpm</strong>. En dessous de 60 = bradycardie (souvent retrouvée chez les athlètes entraînés). Au-dessus de 100 = tachycardie."},
+
+// ─── PHYSIOLOGIE — SYSTÈME RESPIRATOIRE ───────────────
+{id:"p26",cat:"physio",q:"Quel est le muscle principal de la respiration ?",opts:["Muscles intercostaux","Diaphragme","Grand pectoral","Sternocléidomastoïdien"],r:1,e:"Le <strong>diaphragme</strong> est le muscle respiratoire le plus important. Sa contraction (inspiration) provoque son aplatissement et augmente le volume thoracique, créant une dépression qui aspire l'air. L'expiration au repos est passive."},
+{id:"p27",cat:"physio",q:"Comment se nomme le phénomène d'échange gazeux O₂/CO₂ entre le sang et les muscles ?",opts:["Hématose","Respiration externe","Respiration interne (tissulaire)","Ventilation"],r:2,e:"La <strong>respiration interne (tissulaire)</strong> désigne les échanges gazeux entre le sang et les cellules musculaires : O₂ passe du sang vers les muscles, CO₂ du muscle vers le sang. La respiration externe (hématose) désigne les échanges au niveau des alvéoles pulmonaires."},
+{id:"p28",cat:"physio",q:"À l'effort, comment la ventilation pulmonaire s'adapte-t-elle ?",opts:["Fréquence respiratoire diminue","Fréquence respiratoire et volume courant augmentent","Seul le volume courant augmente","La ventilation ne change pas"],r:1,e:"À l'effort, la ventilation minute augmente via : <strong>augmentation de la fréquence respiratoire ET du volume courant</strong> (VE = FR × VC). Au repos : VE ≈ 6-8 L/min. À l'effort maximal : VE peut atteindre 100-150 L/min."},
+
+// ─── PHYSIOLOGIE — HORMONES DE L'EFFORT ───────────────
+{id:"p29",cat:"physio",q:"Quelle hormone est principalement libérée lors d'un effort intense (réponse au stress aigu) ?",opts:["Insuline","Cortisol","Adrénaline (épinéphrine)","Mélatonine"],r:2,e:"L'<strong>adrénaline</strong> (épinéphrine) est libérée par la médullosurrénale lors d'un effort intense. Elle augmente la FC, la pression artérielle, libère le glucose dans le sang (glycogénolyse) et prépare l'organisme à l'effort ('fight or flight')."},
+{id:"p30",cat:"physio",q:"Quel est l'effet de l'insuline sur le glucose ?",opts:["Elle augmente la glycémie","Elle favorise l'entrée du glucose dans les cellules (baisse la glycémie)","Elle bloque la lipogenèse","Elle stimule la gluconéogenèse"],r:1,e:"L'<strong>insuline</strong> (hormone du pancréas) <strong>fait baisser la glycémie</strong> en favorisant l'entrée du glucose dans les cellules musculaires et adipeuses, et en stimulant la glycogénogenèse. La pratique physique a un effet insulino-mimétique."},
+{id:"p31",cat:"physio",q:"La filière anaérobie lactique est caractérisée par :",opts:["Production d'ATP sans lactate, < 10 sec","Production d'ATP avec lactate, sans O₂, effort 30 sec à 2 min","Production d'ATP avec O₂, effort > 3 min","Utilisation exclusive des lipides"],r:1,e:"La filière <strong>anaérobie lactique</strong> (glycolyse anaérobie) produit de l'ATP à partir du glucose <strong>sans oxygène</strong>, avec production de lactate. Elle intervient sur des efforts d'intensité élevée de <strong>30 secondes à 2 minutes</strong> environ."},
+
+// ─── NUTRITION — COMPLÉMENTS ─────────────────────────
+{id:"n19",cat:"nutri",q:"Quelle est la glycémie normale à jeun chez l'adulte ?",opts:["0,3-0,5 g/L","0,7-1,1 g/L","1,5-2,0 g/L","2,5-3,0 g/L"],r:1,e:"La glycémie normale à jeun est de <strong>0,7 à 1,1 g/L</strong> (ou 3,9 à 6,1 mmol/L). En dessous de 0,7 = hypoglycémie. Au-dessus de 1,26 g/L à deux reprises = diabète de type 2."},
+{id:"n20",cat:"nutri",q:"Les glucides complexes (amidon) ont un index glycémique :",opts:["Toujours plus élevé que les sucres simples","Généralement plus bas que les sucres simples","Identique aux lipides","Nul car ils n'impactent pas la glycémie"],r:1,e:"Les <strong>glucides complexes</strong> (céréales complètes, légumineuses) ont généralement un <strong>IG plus bas</strong> que les sucres simples car leur digestion est plus lente. Mais ce n'est pas absolu : la pomme de terre cuite a un IG très élevé malgré son amidon."},
+{id:"n21",cat:"nutri",q:"Quel nutriment est indispensable à la synthèse de testostérone ?",opts:["Les glucides","Les protéines","Les lipides (cholestérol)","Le fer"],r:2,e:"La testostérone et toutes les hormones stéroïdiennes sont synthétisées à partir du <strong>cholestérol</strong>. Un apport lipidique insuffisant (< 20% de l'AET) peut perturber la production hormonale, réduire la testostéronémie et nuire à la récupération et l'hypertrophie."},
+{id:"n22",cat:"nutri",q:"Qu'est-ce que l'anabolisme ?",opts:["La dégradation des molécules complexes en molécules simples","La construction de molécules complexes à partir de molécules simples (synthèse)","L'élimination des déchets métaboliques","La lipolyse"],r:1,e:"L'<strong>anabolisme</strong> désigne les processus de <strong>construction</strong> (synthèse de protéines, glycogène, lipides). Il est favorisé par la testostérone, l'IGF-1, l'insuline. Le catabolisme est le processus inverse (dégradation)."},
+{id:"n23",cat:"nutri",q:"Quel est le rôle principal du fer dans l'organisme ?",opts:["Synthèse des protéines contractiles","Transport de l'oxygène dans l'hémoglobine des globules rouges","Minéralisation osseuse","Régulation de la glycémie"],r:1,e:"Le <strong>fer</strong> est indispensable à la synthèse de l'<strong>hémoglobine</strong> (globules rouges) qui transporte l'O₂ dans le sang. Une carence en fer entraîne une anémie ferriprive : fatigue, baisse des performances, essoufflement à l'effort."},
+{id:"n24",cat:"nutri",q:"Quel est l'apport énergétique total journalier (AET) recommandé pour un homme adulte actif de 70 kg ?",opts:["1200-1500 kcal","1800-2000 kcal","2500-3000 kcal","4500-5000 kcal"],r:2,e:"L'<strong>AET</strong> d'un homme adulte actif de 70 kg est d'environ <strong>2500 à 3000 kcal/jour</strong> (métabolisme de base ≈ 1700 kcal + activité physique). Il varie selon le niveau d'activité (sédentaire, actif, très actif) et la composition corporelle."},
+{id:"n25",cat:"nutri",q:"La déshydratation de 2% du poids corporel entraîne :",opts:["Aucun effet notable","Une baisse des performances de 10-20%","Un arrêt cardiaque","Une augmentation de la force"],r:1,e:"Une déshydratation de seulement <strong>2% du poids corporel</strong> entraîne une <strong>baisse des performances de 10 à 20%</strong> (force, endurance, concentration). La soif apparaît déjà à 1% de déshydratation → ne pas attendre d'avoir soif."},
+{id:"n26",cat:"nutri",q:"Quels sont les lipides 'essentiels' que l'organisme ne peut pas synthétiser ?",opts:["Cholestérol et triglycérides","Acides gras saturés","Acides gras polyinsaturés oméga-3 et oméga-6","Phospholipides"],r:2,e:"Les <strong>acides gras oméga-3 (ALA, EPA, DHA) et oméga-6 (acide linoléique)</strong> sont dits 'essentiels' car l'organisme ne peut pas les synthétiser → apport alimentaire obligatoire. Sources oméga-3 : poissons gras, graines de lin, noix. Oméga-6 : huiles végétales."},
+
+// ─── RÉGLEMENTATION / SÉCURITÉ ────────────────────────
+{id:"r1",cat:"regl",q:"Quelle certification est requise pour encadrer contre rémunération des activités de musculation en France ?",opts:["BPJEPS AF option C","CQP IF ou BPJEPS AF option D","DEUG STAPS","Brevet de secourisme PSC1"],r:1,e:"Pour exercer contre rémunération dans le secteur musculation/haltères, il faut obligatoirement une qualification inscrite au RNCP comme le <strong>CQP IF (Instructeur Fitness) ou le BPJEPS AF option D</strong>."},
+{id:"r2",cat:"regl",q:"Quelle est la signification de l'acronyme BPJEPS ?",opts:["Brevet Professionnel de la Jeunesse, de l'Éducation Populaire et du Sport","Brevet Préparatoire des Jeunes Éducateurs et Professionnels du Sport","Brevet Personnel de Jeunesse et d'Enseignement du Sport","Bilan Professionnel de Jeunesse et d'Enseignement Physique du Sport"],r:0,e:"BPJEPS = <strong>Brevet Professionnel de la Jeunesse, de l'Éducation Populaire et du Sport</strong>. C'est un diplôme de niveau 4 (Bac) permettant l'encadrement rémunéré d'activités sportives."},
+{id:"r3",cat:"regl",q:"Qu'est-ce que le POSS (Plan d'Organisation de la Surveillance et des Secours) ?",opts:["Un document facultatif pour les grandes salles","Un document obligatoire décrivant l'organisation des secours en cas d'accident","Le plan d'évacuation de la salle","Le registre des adhérents"],r:1,e:"Le <strong>POSS</strong> est un document <strong>obligatoire</strong> dans les établissements recevant du public pour les activités sportives. Il décrit les procédures d'alerte, les responsabilités et les moyens de secours en cas d'accident."},
+{id:"r4",cat:"regl",q:"Quelle est la durée de validité du certificat médical de non-contre-indication à la pratique sportive pour les adultes (hors compétition) ?",opts:["6 mois","1 an","2 ans","3 ans"],r:3,e:"Depuis la loi de 2022, le certificat médical de non-contre-indication n'est plus obligatoire pour la pratique sportive en loisir pour les adultes. Lorsqu'il est requis (compétition), sa durée de validité est de <strong>3 ans</strong>."},
+{id:"r5",cat:"regl",q:"Le principe de 'réversibilité' en entraînement signifie :",opts:["Les gains s'accumulent indéfiniment","Les adaptations acquises se perdent en cas d'arrêt de l'entraînement","On peut toujours revenir à son niveau précédent","Les blessures sont réversibles avec le repos"],r:1,e:"La <strong>réversibilité</strong> (désentraînement) stipule que les adaptations physiologiques acquises <strong>disparaissent progressivement à l'arrêt de l'entraînement</strong>. La VO2max baisse dès 2 semaines d'arrêt, la force musculaire en 3-4 semaines."},
+{id:"r6",cat:"regl",q:"En salle de sport, quelle est la règle concernant les ceintures de sécurité en musculation ?",opts:["Obligatoires pour tous les exercices","Recommandées uniquement pour les charges très lourdes sur exercices axiaux (squat, SDT)","Interdites car elles atrophient les muscles stabilisateurs","Obligatoires seulement pour les débutants"],r:1,e:"Les ceintures lombaires sont <strong>recommandées pour les charges maximales sur exercices axiaux</strong> (squat, soulevé de terre, développé militaire). Une utilisation systématique peut limiter le renforcement des muscles stabilisateurs profonds."},
+{id:"r7",cat:"regl",q:"Qu'est-ce qu'une contre-indication absolue à l'exercice physique ?",opts:["L'hypertension légère contrôlée","L'asthme léger","L'insuffisance cardiaque décompensée aiguë","L'ostéoporose modérée"],r:2,e:"L'<strong>insuffisance cardiaque décompensée aiguë</strong> est une contre-indication absolue à tout effort physique. L'hypertension légère contrôlée, l'asthme léger ou l'ostéoporose modérée sont des contre-indications relatives nécessitant une adaptation."},
+{id:"r8",cat:"regl",q:"Quelle est l'obligation légale de l'instructeur concernant les premiers secours ?",opts:["Avoir un diplôme médical","Posséder une formation aux premiers secours (PSC1 minimum ou équivalent)","Connaître le numéro du SAMU","Avoir suivi une formation de 3 jours minimum en médecine sportive"],r:1,e:"Tout professionnel encadrant des activités sportives doit posséder <strong>une attestation de formation aux premiers secours</strong> (PSC1 minimum). Cette obligation est inscrite dans le cadre du Code du Sport."},
+{id:"r9",cat:"regl",q:"Quel est le principe de 'spécificité' de l'entraînement ?",opts:["S'entraîner spécifiquement avec un coach","Les adaptations sont spécifiques à la nature de l'entraînement réalisé","Travailler un seul groupe musculaire par séance","Toujours s'entraîner à la même heure"],r:1,e:"Le principe de <strong>spécificité</strong> stipule que les adaptations physiologiques sont <strong>spécifiques aux sollicitations imposées</strong>. Un entraînement en endurance améliore l'endurance, pas la force maximale, et vice versa."},
+{id:"r10",cat:"regl",q:"Qu'est-ce qu'un échauffement général correct avant une séance de musculation doit inclure ?",opts:["Uniquement des étirements statiques","Élévation progressive de la FC, activation musculaire générale, mobilisation articulaire","10 minutes de course à allure maximale","Des séries à charge maximale pour activer les muscles"],r:1,e:"Un échauffement efficace comprend : <strong>élévation progressive de la FC</strong> (cardio léger 5-10 min), <strong>mobilisation articulaire</strong> (cercles d'épaules, hanches) et <strong>activation musculaire</strong> progressive. Les étirements statiques profonds AVANT l'effort sont déconseillés (réduction de la force)."},
+{id:"r11",cat:"regl",q:"Quel document doit signer un adhérent avant toute pratique dans un club de fitness ?",opts:["Une déclaration sur l'honneur de bonne santé","Un règlement intérieur et une fiche de renseignements médicaux (PAR-Q)","Un contrat médical avec un médecin du sport","Un avenant d'assurance spécifique"],r:1,e:"Avant toute pratique, l'adhérent doit signer un <strong>règlement intérieur</strong> et remplir un questionnaire de santé (<strong>PAR-Q</strong> ou équivalent) permettant d'identifier les contre-indications potentielles et d'orienter vers un médecin si nécessaire."},
+{id:"r12",cat:"regl",q:"Quelle est la règle de base pour placer les pieds lors d'un squat sécurisé ?",opts:["Pieds joints, orteils vers l'avant","Pieds écartés dans le prolongement des genoux, orteils légèrement ouverts vers l'extérieur","Pieds très écartés, orteils vers l'intérieur","Pieds joints, talons surélevés"],r:1,e:"Pour un squat sécurisé, les <strong>pieds sont écartés dans le prolongement des hanches à des épaules</strong>, orteils légèrement tournés vers l'extérieur (15-30°). Les <strong>genoux doivent suivre la direction des orteils</strong> tout au long du mouvement."},
+
+// ─── ANATOMIE SUPPLÉMENT ──────────────────────────────
+{id:"a19",cat:"anat",q:"Combien d'os compose la colonne vertébrale chez l'adulte ?",opts:["24 os mobiles + sacrum + coccyx","20 os","30 os","33 vertèbres toutes mobiles"],r:0,e:"La colonne comprend <strong>24 vertèbres mobiles</strong> (7 cervicales, 12 thoraciques, 5 lombaires) + le sacrum (5 vertèbres soudées) + le coccyx (4 vertèbres soudées). Soit 33 au total, 24 mobiles."},
+{id:"a20",cat:"anat",q:"Quel est le rôle principal des ligaments ?",opts:["Relier muscle à os","Relier os à os et stabiliser les articulations","Protéger les nerfs","Produire de l'énergie"],r:1,e:"Les <strong>ligaments</strong> relient os à os. Ils stabilisent les articulations et limitent les amplitudes articulaires excessives. Ils ne se contractent pas (tissu passif), contrairement aux muscles."},
+{id:"a21",cat:"anat",q:"Quelle articulation est impliquée dans la flexion plantaire ?",opts:["Articulation du genou","Articulation tibio-tarsienne (cheville)","Articulation coxo-fémorale","Articulation sous-talienne"],r:1,e:"La <strong>flexion plantaire</strong> (pointer la pointe du pied vers le bas) se produit à l'<strong>articulation tibio-tarsienne</strong> (cheville). Le triceps sural (gastrocnémiens + soléaire) en est le moteur."},
+{id:"a22",cat:"anat",q:"Lors d'une traction (pull-up), quel muscle est l'agoniste principal ?",opts:["Grand pectoral","Biceps brachial","Grand dorsal","Deltoïde postérieur"],r:2,e:"À la traction, le mouvement principal est l'adduction et l'extension de l'humérus : le <strong>grand dorsal</strong> est l'agoniste principal. Le biceps intervient en synergiste pour la flexion du coude."},
+{id:"a23",cat:"anat",q:"Quelle est la différence entre un muscle mono-articulaire et bi-articulaire ?",opts:["Un seul chef vs plusieurs chefs","Croise une vs deux articulations","Fibre lente vs fibre rapide","Superficiel vs profond"],r:1,e:"Un muscle <strong>mono-articulaire</strong> ne croise qu'une articulation (ex: vaste médial). Un muscle <strong>biarticulaire</strong> croise deux articulations (ex: biceps brachial, droit fémoral, ischio-jambiers) et peut souffrir d'insuffisance active ou passive."},
+{id:"a24",cat:"anat",q:"Quel os s'articule avec le fémur pour former le genou ?",opts:["Fibula (péroné)","Tibia","Rotule uniquement","Tarse"],r:1,e:"Le genou est l'articulation entre le <strong>fémur et le tibia</strong>. La rotule (patella) est un os sésamoïde intégré dans le tendon quadricipital qui protège et améliore l'efficacité du quadriceps, mais ce n'est pas elle qui supporte la charge principale."},
+{id:"a25",cat:"anat",q:"Quel muscle est responsable de la rotation externe de la hanche (coiffe des rotateurs) ?",opts:["Grand fessier uniquement","Piriforme, obturateurs, jumeaux, carré fémoral","Psoas-iliaque","Adducteurs"],r:1,e:"La <strong>coiffe des rotateurs de hanche</strong> comprend 6 muscles profonds : piriforme, obturateur interne/externe, jumeaux supérieur/inférieur, carré fémoral. Ils stabilisent la tête fémorale, comme la coiffe de l'épaule pour l'humérus."},
+{id:"a26",cat:"anat",q:"Lors d'un soulevé de terre, quelle courbure du rachis doit être maintenue ?",opts:["Flexion maximale (dos rond)","Lordose lombaire naturelle (dos neutre)","Cyphose thoracique accentuée","Colonne totalement plate"],r:1,e:"Le <strong>rachis neutre</strong> (lordose lombaire naturelle conservée) est la position la plus sûre au soulevé de terre. Elle répartit les contraintes de manière optimale sur les disques intervertébraux et protège les structures passives."},
+{id:"a27",cat:"anat",q:"Quelle est l'action du muscle psoas-iliaque ?",opts:["Extension de hanche + flexion du genou","Flexion de hanche + légère rotation externe","Abduction de hanche","Extension du genou"],r:1,e:"Le <strong>psoas-iliaque</strong> est le principal fléchisseur de la hanche. Il est souvent raccourci chez les personnes sédentaires (position assise prolongée), créant une antéversion du bassin et accentuant la lordose lombaire."},
+{id:"a28",cat:"anat",q:"Quel est le rôle du cartilage articulaire ?",opts:["Produire du liquide synovial","Relier les os entre eux","Amortir les chocs et réduire la friction entre les surfaces articulaires","Transmettre les signaux nerveux"],r:2,e:"Le <strong>cartilage articulaire</strong> (cartilage hyalin) recouvre les extrémités osseuses. Il <strong>réduit les frictions</strong> et <strong>amortit les chocs</strong>. Il n'est pas vascularisé → cicatrisation lente et difficile en cas de lésion."},
+{id:"a29",cat:"anat",q:"Quel est le muscle antagoniste du grand pectoral lors du développé couché ?",opts:["Biceps brachial","Grand dorsal et rhomboïdes","Triceps brachial","Deltoïde antérieur"],r:1,e:"Le <strong>grand dorsal et les rhomboïdes</strong> sont les antagonistes du grand pectoral (adducteur-extenseur de l'humérus vs adducteur-fléchisseur). Lors du développé, ils s'allongent en excentrique pour contrôler le retour de la barre."},
+{id:"a30",cat:"anat",q:"Quelle structure anatomique est étirée lors d'une entorse de cheville (mécanisme d'inversion) ?",opts:["Ligament deltoïdien (médial)","Ligaments latéraux (péronéo-astragalien antérieur notamment)","Tendon d'Achille","Ligament croisé antérieur"],r:1,e:"L'entorse en <strong>inversion</strong> (pied qui se tourne vers l'intérieur) étire et peut léser les <strong>ligaments latéraux</strong> de la cheville, notamment le <strong>ligament péronéo-astragalien antérieur</strong> (LPAA), le plus souvent touché."},
+{id:"a31",cat:"anat",q:"Quelle est la fonction du moyen fessier ?",opts:["Extension de hanche uniquement","Abduction de hanche et stabilisation du bassin en appui unipodal","Flexion de genou","Rotation interne de hanche uniquement"],r:1,e:"Le <strong>moyen fessier</strong> est abducteur de hanche et surtout stabilisateur du bassin lors de la marche et course (appui unipodal). Sa faiblesse provoque le signe de Trendelenburg (bascule du bassin côté opposé)."},
+{id:"a32",cat:"anat",q:"Quel type d'articulation est l'épaule (gléno-humérale) ?",opts:["Charnière (ginglyme)","Selle","Énarthrose (rotule dans cotyle)","Pivot"],r:2,e:"L'épaule est une <strong>énarthrose</strong> (articulation sphéroïde) : tête sphérique dans une cavité peu profonde. C'est l'articulation la plus mobile du corps, mais aussi la plus instable, d'où l'importance de la coiffe des rotateurs."},
+{id:"a33",cat:"anat",q:"Lors d'une élévation latérale des bras, quel faisceau du deltoïde est principalement actif ?",opts:["Faisceau antérieur","Faisceau postérieur","Faisceau moyen (acromial)","Les trois faisceaux de façon égale"],r:2,e:"L'<strong>abduction pure</strong> (élévation latérale) est produite principalement par le <strong>faisceau moyen (acromial)</strong> du deltoïde, assisté par le sus-épineux (coiffe des rotateurs) surtout dans les premiers 30° d'élévation."},
+{id:"a34",cat:"anat",q:"Quel muscle est le principal fléchisseur du genou ?",opts:["Quadriceps","Ischio-jambiers","Gastrocnémien","Sartorius"],r:1,e:"Les <strong>ischio-jambiers</strong> (biceps fémoral, semi-tendineux, semi-membraneux) sont les principaux fléchisseurs du genou. Le gastrocnémien participe aussi à la flexion du genou mais en secondaire."},
+{id:"a35",cat:"anat",q:"Quelle est la conséquence biomécanique d'une antéversion du bassin excessive ?",opts:["Réduction de la lordose lombaire","Accentuation de la lordose lombaire et raccourcissement du psoas","Cyphose thoracique réduite","Genou valgum automatique"],r:1,e:"L'<strong>antéversion du bassin</strong> (bascule vers l'avant) accentue la <strong>lordose lombaire</strong>, étire les fessiers et ischio-jambiers, et est souvent associée à un <strong>psoas raccourci</strong>. Elle augmente la compression sur les disques lombaires."},
+{id:"a36",cat:"anat",q:"Lors d'un hip thrust, dans quel plan se déroule principalement le mouvement ?",opts:["Plan frontal","Plan transversal","Plan sagittal","Plan coronal"],r:2,e:"Le hip thrust est une extension de hanche qui se déroule dans le <strong>plan sagittal</strong>, autour d'un axe transversal. Le grand fessier est l'agoniste principal dans ce plan de mouvement."},
+
+// ─── PHYSIOLOGIE SUPPLÉMENT ───────────────────────────
+{id:"p18",cat:"physio",q:"Qu'est-ce que le volume d'éjection systolique (VES) ?",opts:["La fréquence à laquelle le cœur bat","La quantité de sang éjectée par le cœur à chaque battement","La pression artérielle maximale","La capacité totale des poumons"],r:1,e:"Le <strong>VES (Volume d'Éjection Systolique)</strong> est le volume de sang expulsé par le ventricule gauche à chaque contraction. Chez un sédentaire : ~70 mL. Chez un athlète entraîné : 100-120 mL. L'entraînement aérobie augmente le VES (hypertrophie cardiaque excentrique)."},
+{id:"p19",cat:"physio",q:"Quel est le principe de la surcharge progressive (overload) ?",opts:["S'entraîner jusqu'à l'épuisement total","Augmenter progressivement le stimulus d'entraînement pour maintenir l'adaptation","Réduire les temps de repos entre séries","S'entraîner tous les jours sans exception"],r:1,e:"Le principe de <strong>surcharge progressive</strong> stipule que pour continuer à progresser, le stimulus d'entraînement doit être <strong>régulièrement augmenté</strong> (charges, volume, densité, complexité). Sans progression, le corps s'adapte et la progression stagne."},
+{id:"p20",cat:"physio",q:"Quelle hormone est principalement responsable de la croissance musculaire après l'effort ?",opts:["Cortisol","Insuline","Testostérone et IGF-1","Adrénaline"],r:2,e:"La <strong>testostérone et l'IGF-1</strong> (Insulin-like Growth Factor 1) sont les principales hormones anabolisantes. La GH (hormone de croissance) joue aussi un rôle. Le cortisol (hormone du stress) est catabolique et augmente après des efforts longs et intenses."},
+{id:"p21",cat:"physio",q:"Combien de temps dure approximativement la filière glycolytique anaérobie lactique ?",opts:["0-6 secondes","10 secondes à 2-3 minutes","5-10 minutes","Plus de 20 minutes"],r:1,e:"La filière <strong>glycolytique anaérobie lactique</strong> fonctionne de <strong>10 secondes à 2-3 minutes</strong> environ. Elle utilise le glucose sans oxygène, produisant du lactate. Elle correspond aux efforts intenses type 400-800m, séries de musculation à 8-15 répétitions."},
+{id:"p22",cat:"physio",q:"Qu'est-ce que la VO2max représente ?",opts:["La vitesse maximale en course","La consommation maximale d'oxygène par unité de temps et de poids","La fréquence cardiaque maximale","Le volume pulmonaire total"],r:1,e:"La <strong>VO2max</strong> est la <strong>consommation maximale d'oxygène</strong> (mL/kg/min) que l'organisme peut utiliser lors d'un effort maximal. C'est le principal indicateur de la capacité aérobie. Elle dépend du débit cardiaque et de la capacité d'extraction d'O₂ par les muscles."},
+{id:"p23",cat:"physio",q:"Quel effet a un entraînement en force sur la densité osseuse ?",opts:["Aucun effet","Réduction de la densité osseuse","Augmentation de la densité osseuse (ostéogenèse)","Ramollissement des os"],r:2,e:"L'entraînement en force génère des contraintes mécaniques sur les os qui stimulent les <strong>ostéoblastes</strong> (cellules de formation osseuse), augmentant la <strong>densité minérale osseuse</strong>. C'est l'un des meilleurs moyens de prévenir l'ostéoporose."},
+{id:"p24",cat:"physio",q:"Qu'est-ce que le principe d'individualisation en entraînement ?",opts:["Tout le monde doit faire le même programme","Adapter le programme aux caractéristiques, objectifs et niveau de chaque individu","S'entraîner seul sans coach","Ne jamais copier un programme d'athlète professionnel"],r:1,e:"Le principe d'<strong>individualisation</strong> reconnaît que chaque individu répond différemment à l'entraînement selon son âge, sexe, niveau, génétique, objectifs et historique. Un programme doit être <strong>personnalisé</strong> pour être optimal."},
+{id:"p25",cat:"physio",q:"Lors d'un effort aérobie de longue durée (> 1h), quelle adaptation hormonale se produit ?",opts:["Augmentation de l'insuline","Augmentation du cortisol et du glucagon pour mobiliser les substrats énergétiques","Diminution de l'adrénaline","Augmentation de la leptine"],r:1,e:"Lors d'efforts prolongés, le <strong>cortisol et le glucagon</strong> augmentent pour mobiliser le glucose hépatique (glycogénolyse) et les acides gras (lipolyse). L'insuline diminue. Ce contexte hormonal favorise le catabolisme — d'où l'importance de l'apport glucidique pendant l'effort."},
+{id:"p26",cat:"physio",q:"Quelle est la fonction principale des mitochondries dans le muscle ?",opts:["Stocker le glycogène","Produire de l'ATP par voie aérobie (phosphorylation oxydative)","Synthétiser les protéines","Contracter le muscle"],r:1,e:"Les <strong>mitochondries</strong> sont les 'centrales énergétiques' de la cellule. Elles produisent de l'<strong>ATP par voie aérobie</strong> (cycle de Krebs + chaîne respiratoire). L'entraînement aérobie augmente leur nombre et leur efficacité dans les fibres musculaires."},
+{id:"p27",cat:"physio",q:"Quel est l'ordre de recrutement des unités motrices selon le principe de Henneman ?",opts:["D'abord les rapides, puis les lentes","D'abord les lentes (type I), puis les rapides (type II) avec l'augmentation de l'intensité","Aléatoire selon l'exercice","Uniquement les rapides pour la musculation"],r:1,e:"Le <strong>principe de Henneman</strong> (taille) stipule que les unités motrices sont recrutées du plus petit au plus grand : d'abord les fibres <strong>type I (lentes)</strong>, puis les <strong>type IIa</strong>, puis les <strong>type IIx (rapides)</strong> lorsque l'intensité augmente."},
+{id:"p28",cat:"physio",q:"Combien de temps recommande-t-on comme temps de récupération entre deux séances sollicitant les mêmes groupes musculaires ?",opts:["6-12 heures","24 à 72 heures selon l'intensité","1 semaine minimum","Pas de récupération nécessaire"],r:1,e:"La récupération musculaire complète prend <strong>24 à 72 heures</strong> selon l'intensité et le volume (séances excentriques intenses = 48-72h). Ce délai permet la réparation des micro-lésions et la surcompensation protéique."},
+{id:"p29",cat:"physio",q:"Qu'est-ce que l'acide lactique produit lors d'un effort intense ?",opts:["Un poison qui détruit les fibres musculaires","Un déchet qui reste dans le muscle 72h","Un substrat recyclé en énergie par le cœur, foie et muscles oxydatifs (cycle de Cori)","Un signal de fatigue sans autre rôle"],r:2,e:"Le <strong>lactate</strong> (pas 'acide lactique' qui se dissocie immédiatement) est en réalité un <strong>substrat énergétique précieux</strong> : il est transporté vers le cœur, le foie et les fibres de type I qui le reconvertissent en énergie (cycle de Cori). Il n'est PAS responsable des courbatures."},
+{id:"p30",cat:"physio",q:"Quel système est principalement sollicité lors d'un travail en 'endurance de force' (15-20 répétitions à 50-60% 1RM) ?",opts:["Phosphocréatine uniquement","Glycolytique anaérobie lactique + début de filière aérobie","Filière aérobie dominante avec phosphocréatine","Uniquement la filière aérobie lipidique"],r:1,e:"Le travail en <strong>endurance de force</strong> (15-20 reps, 50-60% 1RM, repos courts) sollicite principalement la filière <strong>glycolytique</strong> avec production de lactate, complétée par la filière aérobie. C'est la zone métabolique intermédiaire."},
+{id:"p31",cat:"physio",q:"Qu'est-ce que l'adaptation cardiaque principale à l'entraînement aérobie de longue durée ?",opts:["Hypertrophie concentrique du ventricule gauche","Hypertrophie excentrique du ventricule gauche (augmentation du volume cavitaire)","Épaississement de la paroi sans augmentation du volume","Augmentation de la fréquence cardiaque de repos"],r:1,e:"L'entraînement aérobie provoque une <strong>hypertrophie excentrique</strong> du ventricule gauche : les parois s'épaississent ET la cavité s'agrandit, permettant un VES plus grand. La FC repos diminue. C'est le 'cœur d'athlète'."},
+{id:"p32",cat:"physio",q:"Quelle est la durée minimale recommandée d'une séance de cardio-training pour déclencher des adaptations aérobies significatives ?",opts:["5 minutes","10 minutes","20 à 30 minutes continues (ou fractionnées équivalentes)","2 heures"],r:2,e:"Les recommandations (OMS, ACSM) préconisent <strong>20 à 30 minutes minimum</strong> d'effort aérobie continu (ou l'équivalent en intervalles) pour induire des adaptations cardiovasculaires. Les bénéfices augmentent jusqu'à 60 min puis le retour diminue."},
+{id:"p33",cat:"physio",q:"Comment évolue la pression artérielle systolique lors d'un effort aérobie progressif ?",opts:["Elle diminue","Elle reste constante","Elle augmente proportionnellement à l'intensité","Elle fluctue aléatoirement"],r:2,e:"La <strong>pression artérielle systolique</strong> augmente proportionnellement à l'intensité de l'effort (le cœur pompe plus fort). La pression diastolique reste stable ou diminue légèrement (vasodilatation périphérique). Une hypertension à l'effort excessif est un signal d'alerte."},
+{id:"p34",cat:"physio",q:"Qu'est-ce que la fréquence cardiaque de réserve selon Karvonen ?",opts:["FCmax divisée par 2","FCmax moins FC repos","FC repos plus FCmax","FCmax multipliée par le pourcentage d'intensité"],r:1,e:"FC réserve = <strong>FCmax - FC repos</strong>. La méthode de Karvonen calcule la FC cible : FC repos + (FC réserve × % d'intensité souhaité). Elle est plus précise que la méthode basée uniquement sur la FCmax car elle tient compte du niveau d'entraînement."},
+{id:"p35",cat:"physio",q:"Quel est l'effet d'un échauffement musculaire correct sur la performance ?",opts:["Aucun effet démontré","Réduction de la force maximale","Augmentation de la température musculaire, de la viscosité, de la vitesse de conduction nerveuse → amélioration des performances","Augmentation du risque de blessure"],r:2,e:"L'<strong>échauffement</strong> augmente la température musculaire (+1-2°C) ce qui améliore l'élasticité des tendons, accélère la conduction nerveuse, augmente le débit sanguin et réduit la viscosité musculaire → <strong>meilleures performances et moindre risque de blessure</strong>."},
+{id:"p36",cat:"physio",q:"Qu'est-ce que la relation force-vitesse de Hill implique pour la musculation ?",opts:["Plus on va vite, plus on est fort","La force maximale est produite à vitesse nulle (isométrique) et diminue à mesure que la vitesse concentrique augmente","La vitesse n'influence pas la force","La force est maximale à vitesse moyenne"],r:1,e:"La <strong>courbe de Hill</strong> montre que la force concentrique est maximale à vitesse nulle (isométrique) et <strong>diminue avec la vitesse</strong>. En excentrique, la force dépasse la force isométrique maximale. D'où l'importance du tempo contrôlé en musculation."},
+
+// ─── NUTRITION SUPPLÉMENT ─────────────────────────────
+{id:"n19",cat:"nutri",q:"Quelle est la différence entre glucides simples et complexes ?",opts:["Les simples ont plus de calories","Les simples sont des mono/disaccharides (absorption rapide), les complexes sont des polysaccharides (absorption lente)","Les complexes donnent plus d'énergie à l'unité","Il n'y a pas de différence nutritionnelle"],r:1,e:"Les <strong>glucides simples</strong> (glucose, fructose, saccharose) = 1-2 sucres → absorption rapide, IG élevé. Les <strong>glucides complexes</strong> (amidon, glycogène) = longues chaînes → digestion plus lente, IG modéré à bas. Le contexte (cuisson, fibres) module l'IG réel."},
+{id:"n20",cat:"nutri",q:"Quel est le rôle de l'insuline dans le métabolisme énergétique ?",opts:["Mobiliser les graisses","Permettre l'entrée du glucose dans les cellules et favoriser le stockage (glycogène, lipides)","Augmenter la glycémie","Stimuler la lipolyse"],r:1,e:"L'<strong>insuline</strong> (hormone pancréatique) <strong>abaisse la glycémie</strong> en permettant l'entrée du glucose dans les cellules musculaires et hépatiques, favorise la synthèse de glycogène et, en excès, le stockage sous forme de graisses. Elle est anabolisante."},
+{id:"n21",cat:"nutri",q:"Qu'est-ce que le bilan azoté positif indique ?",opts:["Une déshydratation","Un catabolisme protéique dominant","Une synthèse protéique supérieure à la dégradation = anabolisme","Une carence en minéraux"],r:2,e:"Un <strong>bilan azoté positif</strong> signifie que l'organisme synthétise plus de protéines qu'il n'en dégrade → <strong>anabolisme</strong> musculaire. Il est nécessaire pour la prise de masse. Un bilan négatif indique un catabolisme (jeûne, entraînement sans apport protéique suffisant)."},
+{id:"n22",cat:"nutri",q:"Combien de grammes de glucides faut-il consommer par heure lors d'un effort aérobie > 90 min ?",opts:["0 g (les lipides suffisent)","10-20 g/h","30-60 g/h (jusqu'à 90 g/h si effort très long)","100-150 g/h"],r:2,e:"Pour les efforts de plus de 90 min, il est recommandé de consommer <strong>30 à 60 g de glucides/heure</strong> (glucose + fructose en mélange permet d'aller jusqu'à 90 g/h grâce aux transporteurs intestinaux distincts). Cela retarde l'épuisement du glycogène."},
+{id:"n23",cat:"nutri",q:"Quel est le rôle du fer dans la performance sportive ?",opts:["Favorise la synthèse protéique","Composant de l'hémoglobine et myoglobine → transport de l'oxygène","Stocke le glycogène","Protège les articulations"],r:1,e:"Le <strong>fer</strong> est un composant essentiel de l'<strong>hémoglobine</strong> (transport O₂ dans le sang) et de la <strong>myoglobine</strong> (stockage O₂ dans le muscle). Une carence en fer = anémie ferriprive = baisse marquée de la VO2max et des performances aérobies."},
+{id:"n24",cat:"nutri",q:"Quels sont les acides gras que l'on qualifie d'essentiels ?",opts:["Les acides gras saturés","Les triglycérides","Les oméga-3 (ALA, EPA, DHA) et oméga-6 (acide linoléique)","Tous les acides gras insaturés"],r:2,e:"Les <strong>acides gras essentiels</strong> ne peuvent pas être synthétisés par l'organisme : l'<strong>acide alpha-linolénique (ALA, oméga-3)</strong> et l'<strong>acide linoléique (LA, oméga-6)</strong>. L'EPA et DHA peuvent être synthétisés à partir de l'ALA mais de façon peu efficace → apport direct recommandé."},
+{id:"n25",cat:"nutri",q:"Quel est l'effet de la déshydratation à 2% du poids corporel sur la performance ?",opts:["Aucun effet mesurable","Légère amélioration de la performance (corps plus léger)","Diminution de 10-20% des performances aérobies et cognitives","Amélioration de la force maximale"],r:2,e:"Une déshydratation de seulement <strong>2% du poids corporel</strong> entraîne une baisse de <strong>10 à 20% des performances aérobies</strong> et une altération des fonctions cognitives. À 5%, les performances chutent de 30%. La soif n'apparaît qu'à 1-2% de déshydratation."},
+{id:"n26",cat:"nutri",q:"Qu'est-ce que le rapport oméga-6/oméga-3 idéal dans l'alimentation ?",opts:["50:1","15:1","4:1 ou moins","1:1 obligatoire"],r:2,e:"Le rapport <strong>oméga-6/oméga-3 idéal</strong> est de <strong>4:1 ou inférieur</strong>. Dans l'alimentation occidentale moderne, il est souvent de 15:1 à 20:1, favorisant l'inflammation chronique. Augmenter les oméga-3 (poissons gras, graines de lin, noix) rééquilibre ce rapport."},
+{id:"n27",cat:"nutri",q:"Quel est le rôle du glycogène hépatique (foie) ?",opts:["Alimenter uniquement les muscles en glucose","Maintenir la glycémie sanguine entre les repas pour alimenter le cerveau","Stocker les protéines","Produire des corps cétoniques en permanence"],r:1,e:"Le <strong>glycogène hépatique</strong> (~100-120g) sert à <strong>maintenir la glycémie</strong> sanguine et à alimenter le cerveau entre les repas. Le glycogène musculaire (~400-500g) est réservé au muscle lui-même. Lors d'un effort, le foie libère du glucose dans le sang (glycogénolyse hépatique)."},
+{id:"n28",cat:"nutri",q:"Quelle est la différence entre protéines complètes et incomplètes ?",opts:["Les complètes ont plus de calories","Les complètes contiennent tous les acides aminés essentiels, les incomplètes en manquent au moins un","Les complètes sont mieux digérées","Les incomplètes ne sont pas utiles"],r:1,e:"Les <strong>protéines complètes</strong> (origine animale principalement) contiennent les <strong>9 acides aminés essentiels</strong> en quantités suffisantes. Les <strong>protéines incomplètes</strong> (végétales) manquent d'un ou plusieurs AAE. La complémentation végétale (céréales + légumineuses) permet d'obtenir un profil complet."},
+{id:"n29",cat:"nutri",q:"Quel est l'effet de la caféine sur la performance sportive ?",opts:["Aucun effet prouvé","Amélioration de la performance aérobie et de la vigilance par antagonisme des récepteurs à l'adénosine","Augmentation de la force maximale uniquement","Amélioration uniquement de la récupération"],r:1,e:"La <strong>caféine</strong> est l'une des aides ergogéniques les mieux documentées. Elle améliore la <strong>performance aérobie, la résistance à la fatigue et la vigilance</strong> en bloquant les récepteurs à l'adénosine (signal de fatigue). Dose efficace : 3-6 mg/kg, 30-60 min avant l'effort."},
+{id:"n30",cat:"nutri",q:"Quel est le moment optimal pour consommer des protéines pour maximiser la synthèse protéique post-entraînement ?",opts:["12 heures après l'effort","Uniquement le matin à jeun","Dans les 2 heures post-effort (fenêtre anabolique), répartir 20-40g sur la journée toutes les 3-4h","Uniquement avant de dormir"],r:2,e:"La synthèse protéique est maximisée avec <strong>20-40g de protéines</strong> consommés <strong>dans les 2h post-effort</strong>, puis en maintenant des apports réguliers toutes les <strong>3-4 heures</strong> sur la journée. La leucine (2-3g minimum) est le signal clé de déclenchement de la synthèse."},
+{id:"n31",cat:"nutri",q:"Quel macronutriment est prioritairement épargné lors d'un apport calorique suffisant ?",opts:["Les lipides","Les glucides","Les protéines","Aucun macronutriment n'est épargné"],r:2,e:"Quand l'apport calorique est suffisant (glucides + lipides couvrent les besoins énergétiques), les <strong>protéines sont épargnées</strong> du catabolisme et peuvent être utilisées pour la synthèse musculaire. En déficit calorique sévère, les protéines sont oxydées pour l'énergie (catabolisme musculaire)."},
+{id:"n32",cat:"nutri",q:"Qu'est-ce que l'effet thermique des aliments (TEF) ?",opts:["La température à laquelle les aliments doivent être consommés","L'énergie dépensée pour digérer, absorber et métaboliser les nutriments","La chaleur dégagée par la cuisson des aliments","L'augmentation de la température corporelle après l'effort"],r:1,e:"L'<strong>effet thermique des aliments (TEF)</strong> représente l'énergie dépensée pour digérer et métaboliser la nourriture. Il varie selon les macronutriments : protéines = 20-30% (le plus élevé), glucides = 5-10%, lipides = 0-3%. Les protéines ont donc l'effet rassasiant et thermogénique le plus élevé."},
+{id:"n33",cat:"nutri",q:"Quel est l'apport quotidien en lipides recommandé chez un sportif ?",opts:["Moins de 10% des calories totales","20-35% des calories totales dont au moins 1/3 d'acides gras insaturés","50-60% des calories totales","Zéro lipide pour optimiser la performance"],r:1,e:"Les lipides doivent représenter <strong>20-35% des calories totales</strong> chez un sportif. Ils sont indispensables pour la synthèse hormonale (testostérone), l'absorption des vitamines liposolubles (A,D,E,K) et comme substrat énergétique de base. En dessous de 20%, les performances hormonales se dégradent."},
+{id:"n34",cat:"nutri",q:"Qu'est-ce que le microbiote intestinal et quel est son rôle dans la performance ?",opts:["Des bactéries pathogènes à éliminer","L'ensemble des micro-organismes intestinaux bénéfiques influençant immunité, inflammation et récupération","Un organe digestif secondaire","Un réservoir de glycogène supplémentaire"],r:1,e:"Le <strong>microbiote intestinal</strong> (anciennement 'flore intestinale') est l'ensemble des micro-organismes vivant dans l'intestin. Il influence l'<strong>immunité, l'inflammation systémique, l'absorption des nutriments et la récupération</strong>. Un microbiote diversifié (fibres, aliments fermentés) est associé à de meilleures performances."},
+];
+
+
+// ══════════════════════════════════════════════════════
+// ALGORITHME ADAPTATIF
+// Chaque question a un score (0-5).
+// 0 = jamais vue · 1-2 = lacune · 3-4 = acquis · 5 = maîtrisé
+// Poids de sélection inversement proportionnel au score.
+// ══════════════════════════════════════════════════════
+const STORAGE_KEY = 'cqp_scores_v1';
+let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
+
+async function loadScores() {
+  try {
+    const r = await window.storage.get(STORAGE_KEY);
+    if (r && r.value) scores = JSON.parse(r.value);
+  } catch(e) { scores = {}; }
+  // init missing
+  QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
+}
+
+async function saveScores() {
+  try { await window.storage.set(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
+}
+
+function getWeight(qid) {
+  const s = scores[qid].score;
+  // Score 0 = poids 6 (priorité max), 5 = poids 1 (quasi absent)
+  return Math.max(1, 7 - s);
+}
+
+function pickQuestions(mode, n) {
+  let pool = [...QDB];
+  if (mode === 'weak') {
+    pool = pool.filter(q => scores[q.id].score < 3);
+    if (pool.length < 3) pool = [...QDB]; // fallback
+  }
+  // weighted random
+  const out = [];
+  const used = new Set();
+  let attempts = 0;
+  while (out.length < n && attempts < 500) {
+    attempts++;
+    const totalW = pool.filter(q => !used.has(q.id)).reduce((s,q) => s + getWeight(q.id), 0);
+    if (totalW === 0) break;
+    let r = Math.random() * totalW, acc = 0;
+    for (const q of pool) {
+      if (used.has(q.id)) continue;
+      acc += getWeight(q.id);
+      if (r <= acc) { out.push(q); used.add(q.id); break; }
+    }
+  }
+  return out;
+}
+
+// ══════════════════════════════════════════════════════
+// SESSION STATE
+// ══════════════════════════════════════════════════════
+let session = { questions:[], idx:0, correct:0, wrong:0, answered:false, wrongQs:[] };
+
+function startSession(mode) {
+  const qs = pickQuestions(mode, 10);
+  if (qs.length === 0) { alert("Pas assez de questions disponibles !"); return; }
+  session = { questions: qs, idx: 0, correct: 0, wrong: 0, answered: false, wrongQs: [] };
+  showScreen('quiz');
+  renderQuestion();
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════
+const CATS = {
+  anat:  {label:'Anatomie',  cls:'anat'},
+  physio:{label:'Physiologie',cls:'physio'},
+  nutri: {label:'Nutrition', cls:'nutri'},
+  regl:  {label:'Règlement', cls:'regl'},
+};
+const LETTERS = ['A','B','C','D'];
+
+function renderQuestion() {
+  const q = session.questions[session.idx];
+  const total = session.questions.length;
+  session.answered = false;
+
+  // header
+  document.getElementById('q-num').textContent = `Question ${session.idx+1} / ${total}`;
+  document.getElementById('q-prog').style.width = ((session.idx/total)*100)+'%';
+  document.getElementById('q-score').textContent = `${session.correct} ✓`;
+  const streak = session.correct - session.wrong;
+  const sb = document.getElementById('q-streak');
+  sb.textContent = streak > 1 ? `🔥 ${streak}` : streak < -1 ? `💀 ${streak}` : '';
+
+  // meta
+  const cat = CATS[q.cat];
+  const tag = document.getElementById('q-tag-label');
+  tag.textContent = cat.label;
+  tag.className = `q-tag tag-${cat.cls}`;
+  document.getElementById('q-diff').textContent = `Vu ${scores[q.id].seen}x · ${scores[q.id].score < 3 ? '⚠ À travailler' : scores[q.id].score >= 4 ? '✓ Maîtrisé' : '~ En cours'}`;
+
+  // question
+  document.getElementById('q-text').textContent = q.q;
+
+  // options
+  const opts = document.getElementById('q-opts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span><span class="opt-text">${opt}</span>`;
+    btn.onclick = () => answer(i);
+    opts.appendChild(btn);
+  });
+
+  // explication + next
+  document.getElementById('q-expl').className = 'explanation';
+  document.getElementById('q-expl').innerHTML = '';
+  document.getElementById('next-btn').className = 'next-btn';
+  document.getElementById('next-btn').textContent = session.idx < total-1 ? 'Question suivante →' : 'Voir les résultats →';
+
+  // flag
+  const fb = document.getElementById('flag-btn');
+  fb.className = scores[q.id].flagged ? 'flag-btn flagged' : 'flag-btn';
+}
+
+function answer(chosen) {
+  if (session.answered) return;
+  session.answered = true;
+  const q = session.questions[session.idx];
+  const correct = chosen === q.r;
+
+  // update scores
+  scores[q.id].seen++;
+  if (correct) {
+    scores[q.id].correct++;
+    scores[q.id].score = Math.min(5, scores[q.id].score + 1);
+    session.correct++;
+  } else {
+    scores[q.id].score = Math.max(0, scores[q.id].score - 1);
+    session.wrong++;
+    session.wrongQs.push(q);
+  }
+  saveScores();
+
+  // highlight options
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    btn.onclick = null;
+    if (i === q.r)   btn.classList.add('show-correct');
+    if (i === chosen && !correct) btn.classList.add('wrong');
+  });
+
+  // explication
+  const expl = document.getElementById('q-expl');
+  expl.innerHTML = (correct ? '✅ ' : '❌ ') + q.e;
+  expl.className = 'explanation visible';
+
+  // next
+  document.getElementById('next-btn').className = 'next-btn visible';
+}
+
+function nextQuestion() {
+  session.idx++;
+  if (session.idx >= session.questions.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function toggleFlag() {
+  const q = session.questions[session.idx];
+  scores[q.id].flagged = !scores[q.id].flagged;
+  saveScores();
+  const fb = document.getElementById('flag-btn');
+  fb.className = scores[q.id].flagged ? 'flag-btn flagged' : 'flag-btn';
+}
+
+// ══════════════════════════════════════════════════════
+// RESULT SCREEN
+// ══════════════════════════════════════════════════════
+function showResult() {
+  const total = session.questions.length;
+  const pct = Math.round((session.correct / total) * 100);
+  document.getElementById('r-pct').textContent = pct + '%';
+  document.getElementById('r-correct').textContent = session.correct;
+  document.getElementById('r-wrong').textContent = session.wrong;
+  const flagCount = session.questions.filter(q => scores[q.id].flagged).length;
+  document.getElementById('r-flags').textContent = flagCount;
+
+  let title, sub, emoji;
+
+  if (session.examMode) {
+    // Calcul par domaine
+    const domains = {anat:{label:'Anatomie',ok:0,total:0},physio:{label:'Physiologie',ok:0,total:0},nutri:{label:'Nutrition',ok:0,total:0}};
+    session.questions.forEach((q,i) => {
+      if (!domains[q.cat]) return;
+      domains[q.cat].total++;
+      // retrouver si bonne réponse — on regarde wrongQs
+      if (!session.wrongQs.find(w => w.id === q.id)) domains[q.cat].ok++;
+    });
+    const elapsed = Math.round((Date.now() - session.startTime) / 1000);
+    const min = Math.floor(elapsed/60), sec = elapsed%60;
+    const allPass = Object.values(domains).every(d => d.ok >= 15);
+    emoji = allPass ? '🏆' : '📚';
+    title = allPass ? 'UC3 VALIDÉ !' : 'UC3 non validé';
+    const domainResults = Object.values(domains).map(d =>
+      `${d.label}: ${d.ok}/20 ${d.ok>=15?'✅':'❌ (seuil: 15)'}`
+    ).join(' · ');
+    sub = `Temps: ${min}m${sec.toString().padStart(2,'0')}s · ${domainResults}`;
+  } else {
+    emoji = pct >= 80 ? '🎯' : pct >= 60 ? '💪' : '📚';
+    title = pct >= 80 ? 'Excellent !' : pct >= 60 ? 'Bonne session !' : 'Continue de réviser !';
+    sub = `${session.correct}/${total} bonnes réponses · Prochaine session adaptée à tes lacunes`;
+  }
+
+  document.getElementById('r-emoji').textContent = emoji;
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-sub').textContent = sub;
+
+  const weakList = document.getElementById('r-weak-list');
+  weakList.innerHTML = '';
+  if (session.wrongQs.length > 0) {
+    session.wrongQs.forEach(q => {
+      const d = document.createElement('div');
+      d.className = 'weak-item';
+      d.textContent = q.q.length > 70 ? q.q.slice(0,70)+'…' : q.q;
+      weakList.appendChild(d);
+    });
+    document.getElementById('r-weak-section').style.display = 'block';
+  } else {
+    document.getElementById('r-weak-section').style.display = 'none';
+  }
+
+  showScreen('result');
+  updateHomeStats();
+}
+
+// ══════════════════════════════════════════════════════
+// HOME STATS
+// ══════════════════════════════════════════════════════
+function updateHomeStats() {
+  const seen = Object.values(scores).filter(s => s.seen > 0).length;
+  const total = QDB.filter(q => scores[q.id].seen > 0).length;
+  const correct = QDB.filter(q => scores[q.id].seen > 0).reduce((a, q) => a + scores[q.id].correct, 0);
+  const totalSeen = QDB.filter(q => scores[q.id].seen > 0).reduce((a, q) => a + scores[q.id].seen, 0);
+  const weak = Object.values(scores).filter(s => s.score < 3 && s.seen > 0).length;
+
+  document.getElementById('st-done').textContent = seen;
+  document.getElementById('st-pct').textContent = totalSeen > 0 ? Math.round((correct/totalSeen)*100)+'%' : '—';
+  document.getElementById('st-weak').textContent = weak;
+
+  // subject bars
+  const subList = document.getElementById('subject-list');
+  subList.innerHTML = '';
+  const subjects = [
+    {key:'anat', name:'Anatomie & Biomécanique', cls:'anat',   note:'20 q. à l\'examen'},
+    {key:'physio',name:'Physiologie de l\'effort',cls:'physio', note:'20 q. à l\'examen'},
+    {key:'nutri', name:'Nutrition',               cls:'nutri',  note:'20 q. à l\'examen'},
+    {key:'regl',  name:'Réglementation (bonus)',   cls:'regl',   note:'Culture générale'},
+  ];
+  subjects.forEach(s => {
+    const qs = QDB.filter(q => q.cat === s.key);
+    const seenQ = qs.filter(q => scores[q.id].seen > 0);
+    const mastQ = qs.filter(q => scores[q.id].score >= 4);
+    const pct = qs.length > 0 ? Math.round((mastQ.length/qs.length)*100) : 0;
+
+    const btn = document.createElement('button');
+    btn.className = 'subj-btn';
+    btn.onclick = () => startSessionCat(s.key);
+    btn.innerHTML = `
+      <span class="subj-dot bg-${s.cls}"></span>
+      <div class="subj-info">
+        <div class="subj-name">${s.name}</div>
+        <div class="subj-count">${qs.length} questions · ${s.note} · ${mastQ.length} maîtrisées</div>
+      </div>
+      <div class="subj-bar-wrap"><div class="subj-bar bg-${s.cls}" style="width:${pct}%"></div></div>`;
+    subList.appendChild(btn);
+  });
+}
+
+function startSessionCat(cat) {
+  const qs = QDB.filter(q => q.cat === cat);
+  const weights = qs.map(q => getWeight(q.id));
+  const totalW = weights.reduce((a,b) => a+b, 0);
+  const out = [];
+  const used = new Set();
+  let attempts = 0;
+  while (out.length < Math.min(10, qs.length) && attempts < 500) {
+    attempts++;
+    const tw = qs.filter(q => !used.has(q.id)).reduce((s,q) => s + getWeight(q.id), 0);
+    if (!tw) break;
+    let r = Math.random() * tw, acc = 0;
+    for (const q of qs) {
+      if (used.has(q.id)) continue;
+      acc += getWeight(q.id);
+      if (r <= acc) { out.push(q); used.add(q.id); break; }
+    }
+  }
+  session = { questions: out, idx:0, correct:0, wrong:0, answered:false, wrongQs:[] };
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function startExamMode() {
+  // UC3 réel : 20 anat + 20 physio + 20 nutri, tirage aléatoire pondéré par score
+  const domains = ['anat','physio','nutri'];
+  const out = [];
+  domains.forEach(cat => {
+    const pool = QDB.filter(q => q.cat === cat);
+    const used = new Set();
+    let attempts = 0;
+    while (out.filter(q => q.cat === cat).length < Math.min(20, pool.length) && attempts < 500) {
+      attempts++;
+      const available = pool.filter(q => !used.has(q.id));
+      if (!available.length) break;
+      const tw = available.reduce((s,q) => s + getWeight(q.id), 0);
+      if (!tw) break;
+      let r = Math.random() * tw, acc = 0;
+      for (const q of available) {
+        acc += getWeight(q.id);
+        if (r <= acc) { out.push(q); used.add(q.id); break; }
+      }
+    }
+  });
+  // Mélanger les domaines
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  session = { questions: out, idx:0, correct:0, wrong:0, answered:false, wrongQs:[], examMode:true, startTime: Date.now() };
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function goHome() {
+  showScreen('home');
+  updateHomeStats();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+loadScores().then(() => {
+  updateHomeStats();
+});
+</script>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("/sw.js")
+      .then(r=>console.log("SW registered",r.scope))
+      .catch(e=>console.log("SW error",e));
+  });
+}
+</script>
+<div id="install-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2563eb;color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;z-index:999;font-family:system-ui;font-size:14px">
+  <span>📲 Installer sur ton téléphone</span>
+  <button id="install-btn" style="background:white;color:#2563eb;border:none;padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer">Installer</button>
+  <button onclick="document.getElementById('install-bar').style.display='none'" style="background:transparent;border:none;color:white;font-size:20px;cursor:pointer;padding:0 4px">×</button>
+</div>
+<script>
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById("install-bar").style.display="flex";
+});
+document.getElementById("install-btn").addEventListener("click",()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{
+      deferredPrompt=null;
+      document.getElementById("install-bar").style.display="none";
+    });
+  }
+});
+</script>
+</body>
+</html>
