@@ -162,7 +162,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 165 questions • UC3 • v1.4.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 165 questions • UC3 • v1.5.0</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v1.4.0 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v1.5.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -496,17 +496,17 @@ function forceUpdate() {
   }
 }
 
-async function loadScores() {
+function loadScores() {
   try {
-    const r = await window.storage.get(STORAGE_KEY);
-    if (r && r.value) scores = JSON.parse(r.value);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) scores = JSON.parse(raw);
   } catch(e) { scores = {}; }
   // init missing
   QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
 }
 
 async function saveScores() {
-  try { await window.storage.set(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
 }
 
 function getWeight(qid) {
@@ -832,7 +832,8 @@ function showScreen(id) {
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
-loadScores().then(() => {
+loadScores();
+(function() {
   updateHomeStats();
 });
 </script>
