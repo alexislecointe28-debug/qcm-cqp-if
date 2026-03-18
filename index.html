@@ -190,7 +190,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   </div>
 
   <div>
-    <button class="start-btn start-all" onclick="startSession('all')">▶ Session adaptative (10 q.)</button>
+    <button onclick="forceUpdate()" style="width:100%;padding:10px;background:transparent;border:1px dashed #d0dcea;border-radius:12px;color:#94a3b8;font-size:11px;cursor:pointer;margin-bottom:8px;font-family:var(--font)">🔄 Forcer la mise à jour</button>
+<button class="start-btn start-all" onclick="startSession('all')">▶ Session adaptative (10 q.)</button>
     <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff;margin-bottom:8px" onclick="startExamMode()">🎓 Mode Examen UC3 (60 q. / 30 min)</button>
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
@@ -482,6 +483,22 @@ const QDB = [
 // ══════════════════════════════════════════════════════
 const STORAGE_KEY = 'cqp_scores_v1';
 let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
+
+
+function forceUpdate() {
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      Promise.all(regs.map(r => r.unregister())).then(() => {
+        // Vider tous les caches
+        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+          window.location.reload(true);
+        });
+      });
+    });
+  } else {
+    window.location.reload(true);
+  }
+}
 
 async function loadScores() {
   try {
