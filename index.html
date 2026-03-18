@@ -162,7 +162,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 266 questions • UC3 • v2.0.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 266 questions • UC3 • v2.1.0</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v2.0.0 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v2.1.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -597,17 +597,28 @@ let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
 
 
 function forceUpdate() {
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => {
-      Promise.all(regs.map(r => r.unregister())).then(() => {
-        // Vider tous les caches
-        caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
-          window.location.reload(true);
-        });
+  // Sauvegarder les scores AVANT tout nettoyage
+  const backup = localStorage.getItem(STORAGE_KEY);
+
+  const doReload = () => {
+    // Restaurer les scores si le reload les a effacés
+    if (backup && !localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, backup);
+    }
+    window.location.reload();
+  };
+
+  if ('serviceWorker' in navigator) {
+    // Ne vider QUE le cache SW, pas localStorage
+    caches.keys()
+      .then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .then(() => {
+        navigator.serviceWorker.getRegistrations()
+          .then(regs => Promise.all(regs.map(r => r.unregister())))
+          .then(doReload);
       });
-    });
   } else {
-    window.location.reload(true);
+    doReload();
   }
 }
 
@@ -955,6 +966,12 @@ function showScreen(id) {
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
+
+// Sauvegarde de sécurité avant fermeture/reload
+window.addEventListener('beforeunload', () => {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(scores)); } catch(e) {}
+});
+
 loadScores();
 (function() {
   updateHomeStats();
