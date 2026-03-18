@@ -914,17 +914,17 @@ Inclus :
 HTML uniquement, pas de backticks, pas de bloc de code.`;
 
   try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const res = await fetch("/api/explain", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [{role: "user", content: prompt}]
+        question: q.q,
+        answer: q.opts[q.r],
+        category: cats[q.cat]
       })
     });
     const data = await res.json();
-    const html = data.content && data.content[0] ? data.content[0].text : "Erreur de génération.";
+    const html = data.html || "<p>Erreur de génération.</p>";
     document.getElementById("esm-body").innerHTML = html;
   } catch(e) {
     document.getElementById("esm-body").innerHTML = "<p>Erreur de connexion.</p>";

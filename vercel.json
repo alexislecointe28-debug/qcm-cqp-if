@@ -1,7 +1,10 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "outputDirectory": ".",
+  "functions": {
+    "api/explain.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "headers": [
     {
       "source": "/sw.js",
