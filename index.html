@@ -824,34 +824,17 @@ loadScores().then(() => {
 });
 </script>
 <script>
-let swReg = null;
 if("serviceWorker" in navigator){
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").then(reg => {
-      swReg = reg;
-      // Nouvelle version détectée en attente
-      reg.addEventListener('updatefound', () => {
-        const newWorker = reg.installing;
-        newWorker.addEventListener('statechange', () => {
-          if(newWorker.state === 'installed' && navigator.serviceWorker.controller){
-            // Nouvelle version prête → afficher la bannière
-            document.getElementById('update-bar').classList.add('visible');
-          }
+    navigator.serviceWorker.register("/sw.js")
+      .then(r => {
+        // Quand un nouveau SW prend le contrôle → rechargement automatique
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
         });
-      });
-    }).catch(e => console.log("SW error", e));
-
-    // Après activation du nouveau SW, recharger
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
+      })
+      .catch(e => console.log("SW error", e));
   });
-}
-
-function applyUpdate() {
-  if(swReg && swReg.waiting){
-    swReg.waiting.postMessage('SKIP_WAITING');
-  }
 }
 </script>
 <div id="install-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#2563eb;color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;z-index:999;font-family:system-ui;font-size:14px">
