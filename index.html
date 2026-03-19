@@ -152,6 +152,40 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .tag-physio{background:#dcfce7;color:#15803d}
 .tag-nutri{background:#fef3c7;color:#b45309}
 .tag-regl{background:#ede9fe;color:#6d28d9}
+
+/* ── CHRONO ── */
+.quiz-timer{font-size:11px;font-weight:700;color:var(--muted);padding:2px 8px;border-radius:8px;background:var(--surface2);transition:color .3s}
+.quiz-timer.warning{color:var(--orange);background:#fef3c7}
+.quiz-timer.danger{color:var(--red);background:#fee2e2;animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── STREAK BADGE ── */
+.streak-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:16px}
+
+/* ── DOMAIN SCORES ACCUEIL ── */
+.domain-scores{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
+.dom-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
+.dom-pct{font-size:18px;font-weight:800;line-height:1}
+.dom-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.dom-bar{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
+.dom-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+
+/* ── DIFFICULTE ── */
+.diff-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px;flex-shrink:0}
+
+/* ── WRONG QS ── */
+.wrong-qs-btn{display:block;width:100%;padding:12px;background:#fff3cd;border:1px solid #ffc107;border-radius:12px;color:#856404;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px;text-align:center}
+
+/* ── EXAM TIMER BIG ── */
+.exam-timer-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:0}
+.exam-timer-fill{height:100%;background:var(--green);border-radius:2px;transition:width 1s linear}
+
+/* ── PARTAGE ── */
+.share-btn{display:block;width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:8px}
+
+/* ── FLAGGED SESSION ── */
+.flag-count-badge{background:var(--orange);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:6px}
+
 </style>
 </head>
 <body>
@@ -162,8 +196,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v2.9.8</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v3.0.0</p>
 
+    <div id="streak-row"></div>
     <div class="stats-row">
       <div class="stat-box">
         <div class="stat-num" id="st-done">0</div>
@@ -178,6 +213,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <div class="stat-lbl">À retravailler</div>
       </div>
     </div>
+    <div class="domain-scores" id="domain-scores"></div>
 
     <div class="subject-list" id="subject-list"></div>
   </div>
@@ -189,7 +225,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v2.9.8 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v3.0.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -202,8 +238,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         <span id="q-num">Question 1 / 10</span>
         <span id="q-streak"></span>
       </div>
-      <div class="quiz-prog-bar"><div class="quiz-prog-fill" id="q-prog" style="width:0%"></div></div>
+      <div class="quiz-prog-bar" id="exam-timer-bar" style="display:none"><div class="exam-timer-fill" id="exam-timer-fill" style="width:100%"></div></div>
+      <div class="quiz-prog-bar" id="normal-prog-bar"><div class="quiz-prog-fill" id="q-prog" style="width:0%"></div></div>
     </div>
+    <div id="q-timer" class="quiz-timer" style="display:none">60:00</div>
     <div class="quiz-score-badge" id="q-score">0 ✓</div>
   </div>
 
@@ -258,9 +296,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div id="r-weak-list"></div>
   </div>
   <div class="result-btns">
+    <button class="wrong-qs-btn" id="retry-wrong-btn" style="display:none" onclick="retryWrongQs()">🔁 Retravailler les <span id="retry-count">0</span> erreurs de cette session</button>
     <button class="start-btn" onclick="startSession('all')">▶ Session adaptative</button>
-    <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff" onclick="startExamMode()">🎓 Repasser l'UC3 (60 q.)</button>
+    <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff" onclick="startExamMode()">🎓 Simulation UC3 (60 q.)</button>
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes</button>
+    <button class="share-btn" onclick="shareResult()">📤 Partager ce résultat</button>
     <button class="start-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="goHome()">← Accueil</button>
   </div>
 </div>
@@ -970,6 +1010,9 @@ function getWeight(qid) {
 }
 
 function pickQuestions(mode, n) {
+  if (mode === 'flagged') {
+    return QDB.filter(q => scores[q.id] && scores[q.id].flagged).slice(0, 20);
+  }
   let pool = [...QDB];
   if (mode === 'weak') {
     pool = pool.filter(q => scores[q.id].score < 3);
@@ -1125,9 +1168,59 @@ function toggleFlag() {
 }
 
 // ══════════════════════════════════════════════════════
+// CHRONO
+// ══════════════════════════════════════════════════════
+let timerInterval = null;
+let timerTotal = 0;
+
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  timerTotal = seconds;
+  const timerEl = document.getElementById('q-timer');
+  const fillEl = document.getElementById('exam-timer-fill');
+  const examBar = document.getElementById('exam-timer-bar');
+  const normalBar = document.getElementById('normal-prog-bar');
+
+  timerEl.style.display = 'block';
+  if (session.examMode) {
+    examBar.style.display = 'block';
+    normalBar.style.display = 'none';
+  }
+
+  let remaining = seconds;
+  function tick() {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      showResult();
+      return;
+    }
+    const min = Math.floor(remaining / 60);
+    const sec = remaining % 60;
+    timerEl.textContent = min + ':' + sec.toString().padStart(2, '0');
+    timerEl.className = 'quiz-timer' + (remaining <= 300 ? ' danger' : remaining <= 600 ? ' warning' : '');
+    if (fillEl) fillEl.style.width = (remaining / timerTotal * 100) + '%';
+    if (fillEl) fillEl.style.background = remaining <= 300 ? '#dc2626' : remaining <= 600 ? '#d97706' : '#16a34a';
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  const timerEl = document.getElementById('q-timer');
+  if (timerEl) timerEl.style.display = 'none';
+  const examBar = document.getElementById('exam-timer-bar');
+  const normalBar = document.getElementById('normal-prog-bar');
+  if (examBar) { examBar.style.display = 'none'; }
+  if (normalBar) { normalBar.style.display = 'block'; }
+}
+
+// ══════════════════════════════════════════════════════
 // RESULT SCREEN
 // ══════════════════════════════════════════════════════
 function showResult() {
+  stopTimer();
   const total = session.questions.length;
   const pct = Math.round((session.correct / total) * 100);
   document.getElementById('r-pct').textContent = pct + '%';
@@ -1180,6 +1273,21 @@ function showResult() {
     document.getElementById('r-weak-section').style.display = 'none';
   }
 
+  // Bouton retravailler les erreurs
+  const retryBtn = document.getElementById('retry-wrong-btn');
+  const retryCount = document.getElementById('retry-count');
+  if (retryBtn) {
+    if (session.wrongQs.length > 0) {
+      retryBtn.style.display = 'block';
+      retryCount.textContent = session.wrongQs.length;
+    } else {
+      retryBtn.style.display = 'none';
+    }
+  }
+
+  // Streak update
+  updateStreak();
+
   showScreen('result');
   updateHomeStats();
 }
@@ -1189,14 +1297,53 @@ function showResult() {
 // ══════════════════════════════════════════════════════
 function updateHomeStats() {
   const seen = Object.values(scores).filter(s => s.seen > 0).length;
-  const total = QDB.filter(q => scores[q.id].seen > 0).length;
   const correct = QDB.filter(q => scores[q.id].seen > 0).reduce((a, q) => a + scores[q.id].correct, 0);
   const totalSeen = QDB.filter(q => scores[q.id].seen > 0).reduce((a, q) => a + scores[q.id].seen, 0);
   const weak = Object.values(scores).filter(s => s.score < 3 && s.seen > 0).length;
+  const flagCount = Object.values(scores).filter(s => s.flagged).length;
 
   document.getElementById('st-done').textContent = seen;
   document.getElementById('st-pct').textContent = totalSeen > 0 ? Math.round((correct/totalSeen)*100)+'%' : '—';
   document.getElementById('st-weak').textContent = weak;
+
+  // Streak
+  const streak = getStreak();
+  const streakRow = document.getElementById('streak-row');
+  if (streak >= 2) {
+    streakRow.innerHTML = `<div class="streak-badge">🔥 ${streak} jours de révision d'affilée !</div>`;
+  } else {
+    streakRow.innerHTML = '';
+  }
+
+  // Score par domaine
+  const domScores = document.getElementById('domain-scores');
+  const domDefs = [
+    {key:'anat',  label:'Anatomie',  color:'#3b82f6'},
+    {key:'physio',label:'Physiologie',color:'#10b981'},
+    {key:'nutri', label:'Nutrition', color:'#f59e0b'},
+  ];
+  domScores.innerHTML = '';
+  domDefs.forEach(d => {
+    const qs = QDB.filter(q => q.cat === d.key);
+    const seenQs = qs.filter(q => scores[q.id].seen > 0);
+    const okQs = seenQs.reduce((a,q) => a + scores[q.id].correct, 0);
+    const totalA = seenQs.reduce((a,q) => a + scores[q.id].seen, 0);
+    const pct = totalA > 0 ? Math.round(okQs / totalA * 100) : null;
+    const mastered = qs.filter(q => scores[q.id].score >= 4).length;
+    const mastPct = Math.round(mastered / qs.length * 100);
+    const box = document.createElement('div');
+    box.className = 'dom-box';
+    box.onclick = () => startSessionCat(d.key);
+    box.style.cursor = 'pointer';
+    box.innerHTML = `<div class="dom-pct" style="color:${d.color}">${pct !== null ? pct+'%' : '—'}</div>
+      <div class="dom-lbl">${d.label}</div>
+      <div class="dom-bar"><div class="dom-bar-fill" style="width:${mastPct}%;background:${d.color}"></div></div>`;
+    domScores.appendChild(box);
+  });
+
+  // Compteur flaggées
+  const badge = document.getElementById('flag-count-badge');
+  if (badge) badge.textContent = flagCount;
 
   // subject bars
   const subList = document.getElementById('subject-list');
@@ -1209,7 +1356,6 @@ function updateHomeStats() {
   ];
   subjects.forEach(s => {
     const qs = QDB.filter(q => q.cat === s.key);
-    const seenQ = qs.filter(q => scores[q.id].seen > 0);
     const mastQ = qs.filter(q => scores[q.id].score >= 4);
     const pct = qs.length > 0 ? Math.round((mastQ.length/qs.length)*100) : 0;
 
@@ -1251,12 +1397,25 @@ function startSessionCat(cat) {
 }
 
 function startExamMode() {
-  // UC3 réel : 20 anat + 20 physio + 20 nutri, tirage aléatoire pondéré par score
+  // UC3 réel : 20 anat + 20 physio + 20 nutri
+  // 6 questions physiologie obligatoires sur filières énergétiques + surentraînement (C3.2.2/C3.2.3)
+  const MANDATORY_KEYWORDS = ['filière','phosphocréatine','anaérobie','aérobie','lactate','glycogène','surentraîne','surcompensation','overtraining','fatigue chronique'];
   const domains = ['anat','physio','nutri'];
   const out = [];
+
   domains.forEach(cat => {
     const pool = QDB.filter(q => q.cat === cat);
     const used = new Set();
+
+    // Pour physio : s'assurer d'avoir ~6 questions C3.2.2/C3.2.3
+    if (cat === 'physio') {
+      const mandatory = pool.filter(q =>
+        MANDATORY_KEYWORDS.some(k => q.q.toLowerCase().includes(k) || (q.e||'').toLowerCase().includes(k))
+      );
+      const mandatoryPick = mandatory.sort(() => Math.random() - .5).slice(0, Math.min(6, mandatory.length));
+      mandatoryPick.forEach(q => { out.push(q); used.add(q.id); });
+    }
+
     let attempts = 0;
     while (out.filter(q => q.cat === cat).length < Math.min(20, pool.length) && attempts < 500) {
       attempts++;
@@ -1271,17 +1430,113 @@ function startExamMode() {
       }
     }
   });
-  // Mélanger les domaines
+
+  // Mélanger
   for (let i = out.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
   }
+
   session = { questions: out, idx:0, correct:0, wrong:0, answered:false, wrongQs:[], examMode:true, startTime: Date.now() };
+  startTimer(60 * 60); // 60 minutes
   showScreen('quiz');
   renderQuestion();
 }
 
+// ══════════════════════════════════════════════════════
+// RETRAVAILLER LES ERREURS
+// ══════════════════════════════════════════════════════
+function retryWrongQs() {
+  const qs = session.wrongQs.slice();
+  if (!qs.length) return;
+  for (let i = qs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [qs[i], qs[j]] = [qs[j], qs[i]];
+  }
+  session = { questions: qs, idx:0, correct:0, wrong:0, answered:false, wrongQs:[], shuffledCorrect:0 };
+  showScreen('quiz');
+  renderQuestion();
+}
+
+// ══════════════════════════════════════════════════════
+// STREAK
+// ══════════════════════════════════════════════════════
+function updateStreak() {
+  const today = new Date().toISOString().slice(0,10);
+  const data = JSON.parse(localStorage.getItem('_cqp_streak') || '{"streak":0,"last":""}');
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (data.last === today) {
+    return data.streak;
+  } else if (data.last === yesterday) {
+    data.streak++;
+  } else if (data.last !== today) {
+    data.streak = 1;
+  }
+  data.last = today;
+  localStorage.setItem('_cqp_streak', JSON.stringify(data));
+  return data.streak;
+}
+
+function getStreak() {
+  const data = JSON.parse(localStorage.getItem('_cqp_streak') || '{"streak":0,"last":""}');
+  const today = new Date().toISOString().slice(0,10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (data.last !== today && data.last !== yesterday) return 0;
+  return data.streak;
+}
+
+// ══════════════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════════════
+function exportCSV() {
+  const rows = ['Question,Catégorie,Vues,Correctes,Score,Maîtrisée,Marquée'];
+  QDB.forEach(q => {
+    const s = scores[q.id];
+    if (!s || s.seen === 0) return;
+    const cats = {anat:'Anatomie',physio:'Physiologie',nutri:'Nutrition',regl:'Réglementation'};
+    rows.push([
+      '"' + q.q.replace(/"/g,'""') + '"',
+      cats[q.cat] || q.cat,
+      s.seen,
+      s.correct,
+      s.score,
+      s.score >= 4 ? 'Oui' : 'Non',
+      s.flagged ? 'Oui' : 'Non'
+    ].join(','));
+  });
+  const blob = new Blob([rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'progression_cqp_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════
+// PARTAGER LE RÉSULTAT
+// ══════════════════════════════════════════════════════
+function shareResult() {
+  const total = session.questions.length;
+  const pct = Math.round((session.correct / total) * 100);
+  const streak = getStreak();
+  const domTxt = session.examMode ? (() => {
+    const d = {anat:{ok:0,t:0},physio:{ok:0,t:0},nutri:{ok:0,t:0}};
+    session.questions.forEach(q => { if(d[q.cat]){d[q.cat].t++;if(!session.wrongQs.find(w=>w.id===q.id))d[q.cat].ok++;} });
+    return `\nAnatomie: ${d.anat.ok}/20 | Physio: ${d.physio.ok}/20 | Nutrition: ${d.nutri.ok}/20`;
+  })() : '';
+
+  const txt = `🎯 CQP Instructeur Fitness - UC3\n${pct}% (${session.correct}/${total})${domTxt}${streak > 1 ? '\n🔥 '+streak+' jours de révision d\'affilée' : ''}\nRévise avec qcm-cqp-if.vercel.app`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'Mon score CQP IF', text: txt }).catch(()=>{});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(() => alert('Résultat copié dans le presse-papier !'));
+  } else {
+    prompt('Copie ce texte :', txt);
+  }
+}
+
 function goHome() {
+  stopTimer();
   showScreen('home');
   updateHomeStats();
 }
