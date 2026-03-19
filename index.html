@@ -162,7 +162,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 412 questions • UC3 • v2.9.2</p>
+    <p class="app-sub">S'adapte à tes lacunes • 412 questions • UC3 • v2.9.3</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v2.9.2 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v2.9.3 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -773,42 +773,73 @@ const QDB = [
 const STORAGE_KEY = 'cqp_scores_v1';
 let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
 
+// ── IndexedDB (stockage principal, survit aux MAJ PWA) ──────────────
+const DB_NAME = 'cqp_db', DB_VER = 1, STORE = 'scores';
+let db = null;
+
+function openDB() {
+  return new Promise((res, rej) => {
+    if (db) { res(db); return; }
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(STORE);
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+function idbSave(data) {
+  return openDB().then(db => new Promise((res, rej) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(data, 'scores');
+    tx.oncomplete = res;
+    tx.onerror = () => rej(tx.error);
+  })).catch(() => {}); // silencieux si IDB indisponible
+}
+
+function idbLoad() {
+  return openDB().then(db => new Promise((res) => {
+    const req = db.transaction(STORE, 'readonly').objectStore(STORE).get('scores');
+    req.onsuccess = () => res(req.result || null);
+    req.onerror = () => res(null);
+  })).catch(() => null);
+}
+
 
 function forceUpdate() {
-  // Sauvegarder d'abord — sans toucher au SW ni aux caches
-  try {
-    const d = JSON.stringify(scores);
-    localStorage.setItem(STORAGE_KEY, d);
-    sessionStorage.setItem(STORAGE_KEY + '_bak', d);
-  } catch(e) {}
-  // Rechargement simple — le SW gère la mise à jour en arrière-plan
-  window.location.reload();
+  // Sauvegarder dans les 3 stockages AVANT reload
+  const d = JSON.stringify(scores);
+  idbSave(scores).finally(() => {
+    try { localStorage.setItem(STORAGE_KEY, d); } catch(e) {}
+    try { sessionStorage.setItem(STORAGE_KEY + '_bak', d); } catch(e) {}
+    window.location.reload();
+  });
 }
 
 function loadScores() {
-  try {
-    let raw = localStorage.getItem(STORAGE_KEY);
-    // Si localStorage vide (effacé par Chrome Android PWA au reload),
-    // restaurer depuis sessionStorage (backup de sécurité)
-    if (!raw) {
-      const bak = sessionStorage.getItem(STORAGE_KEY + '_bak');
-      if (bak) {
-        raw = bak;
-        localStorage.setItem(STORAGE_KEY, bak); // restaurer
-        console.log('Scores restaurés depuis sessionStorage');
-      }
+  // Charger depuis IDB (plus fiable) puis fallback localStorage
+  idbLoad().then(data => {
+    if (data) {
+      scores = data;
+    } else {
+      // Fallback localStorage
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY)
+          || sessionStorage.getItem(STORAGE_KEY + '_bak');
+        if (raw) scores = JSON.parse(raw);
+      } catch(e) { scores = {}; }
     }
-    if (raw) scores = JSON.parse(raw);
-  } catch(e) { scores = {}; }
   // init missing
   QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
 }
 
 async function saveScores() {
   try {
+    // IDB = stockage principal (survit aux MAJ PWA Android)
+    idbSave(scores);
+    // localStorage + sessionStorage = backup
     const d = JSON.stringify(scores);
     localStorage.setItem(STORAGE_KEY, d);
-    sessionStorage.setItem(STORAGE_KEY + '_bak', d);
+    try { sessionStorage.setItem(STORAGE_KEY + '_bak', d); } catch(e) {}
   } catch(e) {}
 }
 
@@ -1146,11 +1177,10 @@ function showScreen(id) {
 
 // Sauvegarde de sécurité avant fermeture/reload
 window.addEventListener('beforeunload', () => {
-  try {
-    const d = JSON.stringify(scores);
-    localStorage.setItem(STORAGE_KEY, d);
-    sessionStorage.setItem(STORAGE_KEY + '_bak', d);
-  } catch(e) {}
+  const d = JSON.stringify(scores);
+  idbSave(scores);
+  try { localStorage.setItem(STORAGE_KEY, d); } catch(e) {}
+  try { sessionStorage.setItem(STORAGE_KEY + '_bak', d); } catch(e) {}
 });
 
 loadScores();
