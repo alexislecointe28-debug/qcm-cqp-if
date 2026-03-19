@@ -162,7 +162,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 447 questions • UC3 • v2.9.4</p>
+    <p class="app-sub">S'adapte à tes lacunes • 447 questions • UC3 • v2.9.5</p>
 
     <div class="stats-row">
       <div class="stat-box">
@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v2.9.4 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v2.9.5 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -859,15 +859,24 @@ function loadScores() {
     if (data) {
       scores = data;
     } else {
-      // Fallback localStorage
       try {
         const raw = localStorage.getItem(STORAGE_KEY)
           || sessionStorage.getItem(STORAGE_KEY + '_bak');
         if (raw) scores = JSON.parse(raw);
       } catch(e) { scores = {}; }
     }
-  // init missing
-  QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
+    // Init des nouvelles questions manquantes — DANS le .then()
+    QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
+    updateHomeStats(); // Déclencher l'affichage UNE FOIS les scores chargés
+  }).catch(() => {
+    // Fallback si IDB échoue complètement
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) scores = JSON.parse(raw);
+    } catch(e) {}
+    QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
+    updateHomeStats();
+  });
 }
 
 async function saveScores() {
@@ -1221,10 +1230,7 @@ window.addEventListener('beforeunload', () => {
   try { sessionStorage.setItem(STORAGE_KEY + '_bak', d); } catch(e) {}
 });
 
-loadScores();
-(function() {
-  updateHomeStats();
-});
+loadScores(); // updateHomeStats() est appelé à l'intérieur une fois IDB chargé
 </script>
 <script>
 if("serviceWorker" in navigator){
