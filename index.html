@@ -270,7 +270,7 @@ body.dark .rapport-verdict.fail{background:#2d0000;border-color:#dc2626}
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.0.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.0.1</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -301,7 +301,7 @@ body.dark .rapport-verdict.fail{background:#2d0000;border-color:#dc2626}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v4.0.0 · <button class="sound-toggle" id="sound-toggle" onclick="toggleSound()">🔇 Son</button> · <span id="sw-status">⏳</span>
+    v4.0.1 · <button class="sound-toggle" id="sound-toggle" onclick="toggleSound()">🔇 Son</button> · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -1040,6 +1040,7 @@ const QDB = [
 // ══════════════════════════════════════════════════════
 const STORAGE_KEY = 'cqp_scores_v1';
 let scores = {}; // { qid: { score:0, seen:0, correct:0, flagged:false } }
+let rushQuestionTimer = null; // déclaré ici pour éviter ReferenceError dans answer()
 
 // ── IndexedDB (stockage principal, survit aux MAJ PWA) ──────────────
 const DB_NAME = 'cqp_db', DB_VER = 1, STORE = 'scores';
@@ -2011,7 +2012,6 @@ function startRushMode() {
   startRushTimer();
 }
 
-let rushQuestionTimer = null;
 function startRushTimer() {
   clearInterval(rushQuestionTimer);
   let secs = 60;
