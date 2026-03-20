@@ -1,4 +1,4 @@
-const CACHE = 'cqp-v4';
+const CACHE = 'cqp-v411';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 // Install: cache silencieusement, skipWaiting pour activation immédiate

@@ -1,12 +1,16 @@
 {
-  "name": "QCM CQP IF — Révision",
-  "short_name": "QCM CQP",
-  "description": "Révision intelligente pour le CQP Instructeur Fitness — Anatomie, Physiologie, Nutrition",
+  "name": "CQP IF — Révision QCU",
+  "short_name": "CQP IF",
+  "description": "Prépare l'UC3 du CQP Instructeur Fitness. 512 QCU adaptatifs en anatomie, physiologie, nutrition et réglementation. Fonctionne hors connexion.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f0f4f8",
   "theme_color": "#2563eb",
   "orientation": "portrait",
+  "lang": "fr",
+  "categories": [
+    "education"
+  ],
   "icons": [
     {
       "src": "icon-192.png",
@@ -19,6 +23,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-1.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Accueil — sessions adaptatives"
+    },
+    {
+      "src": "screenshot-2.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Question avec explication"
     }
   ]
 }
