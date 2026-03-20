@@ -226,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.1</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -257,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v4.1.0 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v4.1.1 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.1.0 -->
+<!-- ESM supprimé v4.1.1 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -1809,6 +1809,55 @@ function startRushTimer() {
       playSound('wrong');
     }
   }, 1000);
+}
+
+// ══════════════════════════════════════════════════════
+// BACKUP / RESTORE PROGRESSION
+// ══════════════════════════════════════════════════════
+function backupData() {
+  const payload = {
+    v: '1',
+    ts: Date.now(),
+    scores: scores,
+    history: JSON.parse(localStorage.getItem('_cqp_history') || '[]'),
+    confusers: JSON.parse(localStorage.getItem('_cqp_confusers') || '{}'),
+    streak: JSON.parse(localStorage.getItem('_cqp_streak') || '{}'),
+  };
+  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cqpif_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function restoreData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      try {
+        const payload = JSON.parse(ev.target.result);
+        if (!payload.scores) { alert('Fichier invalide.'); return; }
+        scores = payload.scores;
+        // Compléter les nouvelles questions manquantes
+        QDB.forEach(q => { if (!scores[q.id]) scores[q.id] = {score:0,seen:0,correct:0,flagged:false}; });
+        await saveScores();
+        if (payload.history) localStorage.setItem('_cqp_history', JSON.stringify(payload.history));
+        if (payload.confusers) localStorage.setItem('_cqp_confusers', JSON.stringify(payload.confusers));
+        if (payload.streak) localStorage.setItem('_cqp_streak', JSON.stringify(payload.streak));
+        updateHomeStats();
+        alert('✅ Progression restaurée !');
+      } catch(err) {
+        alert('Erreur lors de la restauration : ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
 function goHome() {
