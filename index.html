@@ -104,24 +104,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 
 /* ── EN SAVOIR PLUS ── */
-.esm-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 14px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
-.esm-btn:active{opacity:.8}
-.esm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end}
-.esm-overlay.open{display:flex}
-.esm-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:0 0 32px}
-.esm-handle{width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0}
-.esm-header{padding:14px 18px 10px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
-.esm-title{font-size:15px;font-weight:700;color:#0f1f33}
-.esm-close{width:32px;height:32px;background:#f1f5f9;border:none;border-radius:8px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.esm-body{padding:16px 18px;font-size:13.5px;line-height:1.7;color:#334155}
-.esm-body h3{font-size:14px;font-weight:700;color:#0f1f33;margin:14px 0 6px}
-.esm-body p{margin:0 0 10px}
-.esm-body ul{padding-left:18px;margin:0 0 10px}
-.esm-body li{margin-bottom:4px}
-.esm-body svg{width:100%;height:auto;margin:12px 0;border-radius:10px;background:#f8fafc;padding:8px}
-.esm-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px;color:#94a3b8;font-size:13px}
-.esm-spinner{width:32px;height:32px;border:3px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Explication enrichie inline */
+.explanation ul{padding-left:18px;margin:8px 0}
+.explanation li{margin-bottom:3px;font-size:13px}
+.explanation br{display:block;content:"";margin:4px 0}
 
 /* ── RESULT ── */
 #result{padding:24px 20px;justify-content:space-between;overflow-y:auto}
@@ -189,7 +175,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* ── DARK MODE ── */
 body.dark{--bg:#0f1117;--surface:#1a1f2e;--surface2:#242938;--border:#2d3448;--text:#e8ecf4}
-body.dark .esm-sheet{background:#1a1f2e;color:#e8ecf4}
+
 body.dark .esm-body{color:#cbd5e1}
 body.dark .esm-body h3{color:#e8ecf4}
 body.dark .explanation{background:#13181f;border-color:#2d3448}
@@ -240,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.0.6</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.0</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -271,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v4.0.6 · 18/03/2026 · <span id="sw-status">⏳</span>
+    v4.1.0 · 18/03/2026 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -328,19 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ═══ EN SAVOIR PLUS MODAL ═══ -->
-<div class="esm-overlay" id="esm-overlay" onclick="closeESM(event)">
-  <div class="esm-sheet" id="esm-sheet">
-    <div class="esm-handle"></div>
-    <div class="esm-header">
-      <span class="esm-title" id="esm-title">En savoir plus</span>
-      <button class="esm-close" onclick="closeESMBtn()">×</button>
-    </div>
-    <div class="esm-body" id="esm-body">
-      <div class="esm-loading"><div class="esm-spinner"></div>Génération en cours…</div>
-    </div>
-  </div>
-</div>
+<!-- ESM supprimé v4.1.0 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -1210,7 +1184,7 @@ function answer(chosen) {
 
   // explication
   const expl = document.getElementById('q-expl');
-  expl.innerHTML = (correct ? '✅ ' : '❌ ') + q.e + '<br><button class="esm-btn" onclick="openESM()">📖 En savoir plus</button>';
+  expl.innerHTML = (correct ? '✅ ' : '❌ ') + q.e;
   expl.className = 'explanation visible';
 
   // next
@@ -1935,60 +1909,6 @@ if (isIOS && !isInStandalone && !alreadyDismissed) {
   }, 3000); // Apparaît 3s après le chargement
 }
 </script>
-<script>
-/* ══ EN SAVOIR PLUS — Claude API ══ */
-let esmCurrentQ = null;
 
-function openESM() {
-  const q = session.questions[session.idx];
-  if (!q) return;
-  esmCurrentQ = q;
-  document.getElementById("esm-overlay").classList.add("open");
-  document.getElementById("esm-title").textContent = "En savoir plus";
-  document.getElementById("esm-body").innerHTML = '<div class="esm-loading"><div class="esm-spinner"></div>Génération en cours…</div>';
-  fetchESM(q);
-}
-
-function closeESM(e) {
-  if (e.target === document.getElementById("esm-overlay")) closeESMBtn();
-}
-function closeESMBtn() {
-  document.getElementById("esm-overlay").classList.remove("open");
-}
-
-async function fetchESM(q) {
-  const cats = {anat:"Anatomie / Biomécanique",physio:"Physiologie de l'effort",nutri:"Nutrition",regl:"Réglementation / Sécurité"};
-  const prompt = `Tu es un formateur expert CQP Instructeur Fitness.
-Question : "${q.q}"
-Bonne réponse : "${q.opts[q.r]}"
-Catégorie : ${cats[q.cat]}
-
-Génère une explication pédagogique approfondie en HTML simple (h3, p, ul/li uniquement, pas de markdown).
-Inclus :
-1. Explication détaillée du concept (3-5 phrases)
-2. Un schéma SVG pédagogique (viewBox="0 0 300 180", couleurs #2563eb #10b981 #f59e0b, fond #f8fafc, texte lisible)
-3. Un point "À retenir pour l'exam" en gras
-
-HTML uniquement, pas de backticks, pas de bloc de code.`;
-
-  try {
-    const res = await fetch("/api/explain", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        question: q.q,
-        answer: q.opts[q.r],
-        category: cats[q.cat]
-      })
-    });
-    const data = await res.json();
-    const html = data.html || "<p>Erreur de génération.</p>";
-    document.getElementById("esm-body").innerHTML = html;
-  } catch(e) {
-    document.getElementById("esm-body").innerHTML = "<p>Erreur de connexion.</p>";
-  }
-}
-
-</script>
 </body>
 </html>
