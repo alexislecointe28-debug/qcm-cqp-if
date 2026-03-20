@@ -266,11 +266,12 @@ body.dark .rapport-verdict.fail{background:#2d0000;border-color:#dc2626}
 <!-- ═══ HOME ═══ -->
 
 <div id="home" class="screen active">
-  <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Mode sombre">🌙</button>
+  <button class="dark-toggle" id="dark-toggle" onclick="toggleDark()" title="Mode sombre" style="right:64px">🌙</button>
+  <button class="dark-toggle" id="sound-toggle" onclick="toggleSound()" title="Son" style="right:20px">🔇</button>
   <div class="home-top">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.0.1</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.0.2</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -301,7 +302,7 @@ body.dark .rapport-verdict.fail{background:#2d0000;border-color:#dc2626}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v4.0.1 · <button class="sound-toggle" id="sound-toggle" onclick="toggleSound()">🔇 Son</button> · <span id="sw-status">⏳</span>
+    v4.0.2 · <span id="sw-status">⏳</span>
   </div>
 </div>
 
@@ -2004,43 +2005,52 @@ function startRushMode() {
   session = {
     questions: qs, idx:0, correct:0, wrong:0,
     answered:false, wrongQs:[], shuffledCorrect:0,
-    rushMode: true, rushTimeouts: []
+    rushMode: true
   };
   showScreen('quiz');
   renderQuestion();
-  // 1 min par question = 5 min total, mais chrono par question visible
   startRushTimer();
 }
 
 function startRushTimer() {
   clearInterval(rushQuestionTimer);
-  let secs = 60;
+  let secs = 30; // 30 secondes par question en mode rush
   const timerEl = document.getElementById('q-timer');
-  if (timerEl) { timerEl.style.display = 'block'; timerEl.className = 'quiz-timer'; }
+  if (timerEl) {
+    timerEl.style.display = 'block';
+    timerEl.textContent = secs + 's';
+    timerEl.className = 'quiz-timer';
+  }
   rushQuestionTimer = setInterval(() => {
     secs--;
     if (timerEl) {
       timerEl.textContent = secs + 's';
-      timerEl.className = 'quiz-timer' + (secs <= 10 ? ' danger' : secs <= 20 ? ' warning' : '');
+      timerEl.className = 'quiz-timer' + (secs <= 5 ? ' danger' : secs <= 10 ? ' warning' : '');
     }
     if (secs <= 0) {
       clearInterval(rushQuestionTimer);
-      // Auto-passer si pas répondu
-      if (!session.answered) {
-        session.answered = true;
-        session.wrong++;
-        session.wrongQs.push(session.questions[session.idx]);
-        // Highlight bonne réponse
-        const opts = document.querySelectorAll('.opt');
-        opts.forEach((btn, i) => {
-          btn.disabled = true;
-          if (i === session.shuffledCorrect) btn.classList.add('show-correct');
-        });
-        const expl = document.getElementById('q-expl');
-        expl.innerHTML = '⏱ Temps écoulé ! ' + session.questions[session.idx].e;
-        expl.className = 'explanation visible';
-        document.getElementById('next-btn').className = 'next-btn visible';
-      }
+      if (!session || session.answered) return;
+      // Temps écoulé — compter comme erreur et auto-avancer dans 1.5s
+      session.answered = true;
+      session.wrong++;
+      session.wrongQs.push(session.questions[session.idx]);
+      scores[session.questions[session.idx].id].seen++;
+      scores[session.questions[session.idx].id].score = Math.max(0, scores[session.questions[session.idx].id].score - 1);
+      saveScores();
+      // Montrer la bonne réponse
+      const opts = document.querySelectorAll('.opt');
+      opts.forEach((btn, i) => {
+        btn.disabled = true; btn.onclick = null;
+        if (i === session.shuffledCorrect) btn.classList.add('show-correct');
+      });
+      const expl = document.getElementById('q-expl');
+      expl.innerHTML = '⏱ <strong>Temps écoulé !</strong> ' + session.questions[session.idx].e;
+      expl.className = 'explanation visible';
+      playSound('wrong');
+      // Auto-avancer après 2 secondes
+      setTimeout(() => {
+        if (session && session.rushMode) nextQuestion();
+      }, 2000);
     }
   }, 1000);
 }
