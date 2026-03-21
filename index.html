@@ -34,7 +34,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .screen.active{display:flex}
 
 /* ── HOME ── */
-#home{padding:28px 20px 20px;justify-content:space-between}
+#home{padding:28px 20px 20px;justify-content:flex-start;overflow-y:auto;gap:0}
 .home-top{}
 .app-eyebrow{font-size:10px;letter-spacing:.2em;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:8px}
 .app-title{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
@@ -223,10 +223,10 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 
 <div id="home" class="screen active">
   <div class="hdr-btns"><button class="hdr-btn" id="btn-dark" onclick="toggleDark()">🌙</button><button class="hdr-btn" id="btn-sound" onclick="toggleSound()">🔇</button></div>
-  <div class="home-top">
+  <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.2</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.3</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -256,8 +256,8 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff;margin-bottom:8px" onclick="startExamMode()">🎓 Mode Examen UC3 (60 q. / 30 min)</button>
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
-  <div style="text-align:center;padding:8px 0 2px;font-size:10px;color:#c0ccd8;letter-spacing:.08em">
-    v4.1.2 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+  <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
+    v4.1.3 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.1.2 -->
+<!-- ESM supprimé v4.1.3 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
