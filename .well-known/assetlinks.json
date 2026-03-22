@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "fr.tondomaine.cqpif",
+    "package_name": "com.paynelope.cqpif",
     "sha256_cert_fingerprints": [
       "REMPLACER_PAR_SHA256_DU_KEYSTORE"
     ]
