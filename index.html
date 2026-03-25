@@ -226,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.7</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.1.8</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -257,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
-    v4.1.7 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+    v4.1.8 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.1.7 -->
+<!-- ESM supprimé v4.1.8 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -676,7 +676,7 @@ const QDB = [
 {id:"a77",cat:"anat",q:"Quels sont les os du tarse proximal (cheville) ?",opts:["Métatarses 1 à 5","Talus (astragale) et calcanéum —","Phalanges du pied","Fibula et tibia uniquement"],r:1,e:"Le tarse proximal comprend le <strong>talus (astragale)</strong> et le <strong>calcanéum</strong>. Le talus s'articule avec le tibia et la fibula (cheville). Le calcanéum reçoit le tendon d'Achille en postérieur. En dessous : 5 os du tarse distal (cunéiformes, cuboïde, naviculaire) + 5 métatarses + phalanges."},
 {id:"a78",cat:"anat",q:"Sur quel repère osseux s'insèrent les ischio-jambiers en proximal ?",opts:["Sur la face postérieure du fémur (ligne âpre)","Sur la tubérosité ischiatique du bassin","Sur le grand trochanter du fémur","Sur la crête iliaque"],r:1,e:"Les ischio-jambiers (biceps fémoral, semi-tendineux, semi-membraneux) ont leur <strong>origine commune sur la tubérosité ischiatique</strong> (en bas du bassin, ce qu'on appelle les 'os des fesses'). C'est pourquoi une bascule du bassin (antéversion) met ces muscles en tension. Palpable en position assise."},
 // ─── TYPES D'ARTICULATIONS ────────────────────────────
-{id:"a79",cat:"anat",q:"Quels sont les 3 types d'articulations selon leur mobilité ?",opts:["Mobile, semi-mobile, immobile","Synarthrose (immobile), amphiarthrose","Articulaire, ligamentaire, tendineuse","Axiale, appendiculaire, centrale"],r:1,e:"Les 3 types selon la mobilité : <strong>Synarthrose</strong> = immobile (sutures du crâne), <strong>Amphiarthrose</strong> = semi-mobile (disques intervertébraux, symphyse pubienne), <strong>Diarthrose</strong> = mobile (genoux, hanches, épaules — les articulations synoviales). Le fitness concerne surtout les diarthroses."},
+{id:"a79",cat:"anat",q:"Quels sont les 3 types d'articulations selon leur mobilité ?",opts:["Mobile, semi-mobile, immobile","Synarthrose (immobile), amphiarthrose (semi-mobile), diarthrose (mobile)","Articulaire, ligamentaire, tendineuse","Axiale, appendiculaire, centrale"],r:1,e:"Les 3 types selon la mobilité : <strong>Synarthrose</strong> = immobile (sutures du crâne), <strong>Amphiarthrose</strong> = semi-mobile (disques intervertébraux, symphyse pubienne), <strong>Diarthrose</strong> = mobile (genoux, hanches, épaules — les articulations synoviales). Le fitness concerne surtout les diarthroses."},
 {id:"a80",cat:"anat",q:"Qu'est-ce qu'une diarthrose ?",opts:["Une articulation immobile comme les sutures du crâne","Articulation mobile avec cartilage, capsule articulaire,","Une articulation uniquement musculaire","Un type de fracture articulaire"],r:1,e:"La <strong>diarthrose</strong> est la seule articulation vraiment mobile. Elle comprend : <strong>cartilage hyalin</strong> (amortissement), <strong>capsule articulaire</strong> (maintien), <strong>liquide synovial</strong> (lubrification, nutrition du cartilage), <strong>ligaments</strong> (stabilisation passive). Exemples : genou, hanche, épaule, coude, cheville."},
 {id:"a81",cat:"anat",q:"Quelle est la différence entre un os long et un os court ?",opts:["La différence est uniquement de taille","Os long = longueur > largeur, contient cavité médullaire (fémur,","Os long = membre supérieur, os court = membre inférieur","Os long = dur, os court = mou"],r:1,e:"<strong>Os long</strong> (fémur, humérus, tibia) : longueur dominante, diaphyse + épiphyses, cavité médullaire contenant la moelle. Rôle de levier. <strong>Os court</strong> (carpe, tarse) : dimensions similaires dans les 3 plans, essentiellement spongieux. Rôle d'amortissement et de transmission des forces. <strong>Os plat</strong> (crâne, scapula, sternum) : protection et surface d'insertion musculaire."},
 {id:"a82",cat:"anat",q:"Quel est le rôle du ménisque dans le genou ?",opts:["Relier le tibia au fémur comme un ligament","Fibrocartilage qui améliore la congruence","Produire le liquide synovial","Remplacer le cartilage en cas d'usure"],r:1,e:"Les <strong>ménisques</strong> (médial et latéral) sont des fibrocartilages en forme de croissant interposés entre fémur et tibia. Ils <strong>améliorent la congruence</strong> (les surfaces s'emboîtent mieux), <strong>absorbent les chocs</strong> (70% de l'amortissement) et <strong>stabilisent le genou</strong>. Leur lésion (méniscite) est fréquente lors des pivots sous charge."},
