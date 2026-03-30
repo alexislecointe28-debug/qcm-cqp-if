@@ -226,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.2.0</p>
+    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.2.1</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -257,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
-    v4.2.0 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+    v4.2.1 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.2.0 -->
+<!-- ESM supprimé v4.2.1 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -591,7 +591,7 @@ const QDB = [
 {id:"n53",cat:"nutri",q:"Quel est le rôle du zinc dans la performance sportive ?",opts:["Stockage du glycogène","Cofacteur de plus de 300 enzymes,","Transport de l'oxygène","Formation osseuse uniquement"],r:1,e:"Le <strong>zinc</strong> est un oligoélément essentiel : cofacteur de >300 enzymes, impliqué dans la <strong>synthèse protéique, la production de testostérone, l'immunité et la cicatrisation</strong>. Une carence (fréquente chez les sportifs intensifs) réduit la testostérone et les performances. Sources : viandes, fruits de mer, légumineuses."},
 {id:"n54",cat:"nutri",q:"Qu'est-ce que le rapport azote/soufre dans l'évaluation de la qualité protéique ?",opts:["Un indicateur de la fraîcheur des aliments","Le PDCAAS/DIAAS","La teneur en graisses des protéines animales","Le ratio glucides/protéines optimal"],r:1,e:"Le <strong>PDCAAS</strong> (et le plus récent <strong>DIAAS</strong>) mesurent la qualité protéique en fonction du profil en acides aminés essentiels ET de la digestibilité. Score max = 1.0. Whey = 1.0, œuf = 1.0, caséine = 1.0, soja = 0.91, blé = 0.42. Utile pour évaluer la qualité des sources protéiques."},
 // ─── RÉGLEMENTATION AVANCÉ ────────────────────────────
-{id:"r13",cat:"regl",q:"Quels sont les 5 blocs de compétences (BC) du CQP Instructeur Fitness ?",opts:["Anatomie, Physiologie, Nutrition, Technique, Pédagogie","UC1: Sécurité, UC2: Accueil publics, UC3: Fondamentaux","Théorie, Pratique, Stage, Mémoire, Soutenance","Force, Cardio, Souplesse, Nutrition, Gestion"],r:1,e:"Le CQP IF comprend : <strong>UC1</strong> (sécurité/secourisme), <strong>UC2</strong> (accueil des publics), <strong>UC3</strong> (fondamentaux scientifiques : anatomie + physiologie + nutrition), <strong>UC4</strong> (marketing/communication), <strong>UC5/6</strong> spécifiques à l'option choisie (CC ou MPT)."},
+{id:"r13",cat:"regl",q:"Quels sont les 5 blocs de compétences (BC) du CQP Instructeur Fitness ?",opts:["Anatomie, Physiologie, Nutrition, Technique, Pédagogie","UC1: Sécurité, UC2: Accueil publics, UC3: Fondamentaux, UC4: Marketing, UC5/6: Option","Théorie, Pratique, Stage, Mémoire, Soutenance","Force, Cardio, Souplesse, Nutrition, Gestion"],r:1,e:"Le CQP IF comprend : <strong>UC1</strong> (sécurité/secourisme), <strong>UC2</strong> (accueil des publics), <strong>UC3</strong> (fondamentaux scientifiques : anatomie + physiologie + nutrition), <strong>UC4</strong> (marketing/communication), <strong>UC5/6</strong> spécifiques à l'option choisie (CC ou MPT)."},
 {id:"r14",cat:"regl",q:"Quelle est la note minimale pour valider l'UC3 (QCM scientifique) du CQP IF ?",opts:["10/20","15/20 dans chaque domaine (anatomie, physiologie,","18/20","La moyenne des 3 domaines doit dépasser 12/20"],r:1,e:"Pour valider l'UC3, le candidat doit obtenir <strong>15/20 minimum dans chacun des 3 domaines</strong> (anatomie, physiologie, nutrition). Un score de 14/20 en anatomie même avec 20/20 dans les autres ne valide pas l'UC3."},
 {id:"r15",cat:"regl",q:"Qu'est-ce que le PAR-Q (Physical Activity Readiness Questionnaire) ?",opts:["Un test de condition physique","Un questionnaire de santé pré-participation","Un formulaire d'inscription au club","Un test de VO2max simplifié"],r:1,e:"Le <strong>PAR-Q</strong> est un questionnaire de santé standardisé à remplir avant toute pratique sportive. Il identifie les contre-indications potentielles (cardiaques, articulaires, etc.) et oriente vers un médecin si nécessaire. Il est recommandé (voire obligatoire) dans toute structure sportive professionnelle."},
 {id:"r16",cat:"regl",q:"Quelle est la différence entre une contre-indication relative et absolue à l'exercice ?",opts:["Il n'y a pas de différence pratique","Absolue = exercice totalement interdit, relative = exercice","Relative = interdit en salle, autorisé dehors","Absolue = interdit le matin, relative = interdit le soir"],r:1,e:"<strong>Contre-indication absolue</strong> = tout exercice est interdit (ex: IDM récent, embolie pulmonaire aiguë, insuffisance cardiaque décompensée). <strong>Contre-indication relative</strong> = exercice possible avec adaptations et avis médical (ex: hypertension contrôlée, diabète, ostéoporose modérée)."},
