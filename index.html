@@ -226,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 512 questions • UC3 • v4.2.6</p>
+    <p class="app-sub">S'adapte à tes lacunes • 572 questions • UC3 • v4.2.7</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -257,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
-    v4.2.6 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+    v4.2.7 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.2.6 -->
+<!-- ESM supprimé v4.2.7 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -952,6 +952,67 @@ const QDB = [
 
 {id:"cqpepoc",cat:"physio",q:"Qu'est-ce que l'EPOC ?",opts:["La quantité maximale d'O₂ consommée durant l'effort","La consommation d'O₂ avant l'effort","La surconsommation d'O₂ après l'effort pour restaurer l'équilibre physiologique"],r:2,e:"L'EPOC est l'<strong>augmentation de la consommation d'O₂ après l'effort</strong> pour restaurer l'équilibre physiologique : resynthèse ATP et phosphocréatine, élimination du lactate, normalisation de la température et des hormones. Plus l'effort est intense, plus l'EPOC est élevé (jusqu'à plusieurs heures après HIIT)."},
 
+,
+{id:"cqp159",cat:"anat",q:"Lorsque la main est en supination, radius et cubitus (ou ulna)…",opts:["sont croisés", "sont parallèles"],r:1,e:"sont parallèles"},
+{id:"cqp160",cat:"anat",q:"La hanche est une articulation :",opts:["Semi-mobile", "Peu mobile", "Très mobile"],r:0,e:"Semi-mobile"},
+{id:"cqp161",cat:"anat",q:"Quel mouvement du bassin provoque une hyperlordose lombaire?",opts:["la rétroversion", "la rotation interne", "l'antéversion"],r:2,e:"l'antéversion"},
+{id:"cqp162",cat:"anat",q:"Quels os composent principalement la ceinture pelvienne ?",opts:["Tibia et fibula", "Clavicules et sternum", "Os iliaques, sacrum et coccyx"],r:2,e:"Os iliaques, sacrum et coccyx"},
+{id:"cqp163",cat:"anat",q:"Combien y-a-t 'il de vertèbres dorsales ?",opts:["12", "10", "7"],r:0,e:"12"},
+{id:"cqp164",cat:"anat",q:"Le triceps sural est plus connu sous le nom de ?",opts:["Mollet", "Fessiers", "Ventre"],r:0,e:"Mollet"},
+{id:"cqp165",cat:"anat",q:"Quel est le nom de l'os du bassin s'articulant avec le fémur ?",opts:["L'os iliaque", "L'os pisiforme", "L'os astragale"],r:0,e:"L'os iliaque"},
+{id:"cqp166",cat:"anat",q:"Quelles vertèbres ne sont pas soudées?",opts:["Les dorsales", "Les sacrées", "Les coccygiennes"],r:0,e:"Les dorsales"},
+{id:"cqp167",cat:"anat",q:"Quel(s) mouvement(s) possible(s) pour l'articulation scapulo-humérale ?",opts:["Flexion / Extension - Rotation Latérale / Médiale - Circumduction - Sonnette interne / externe - Haussement / Abaissement", "Flexion / Extension - Adduction /Abduction - Rotation Médiale / Latérale - Circumduction", "Rotation Latérale / Médiale - Flexion / Extension - Circumduction - Sonnette interne / externe", "Sonnette interne / externe - Haussement / Abaissement - Translation interne / externe"],r:1,e:"Flexion / Extension - Adduction /Abduction - Rotation Médiale / Latérale - Circumduction"},
+{id:"cqp168",cat:"anat",q:"Le gracile est responsable de quelle action ?",opts:["Extension du genou", "Adduction de la hanche", "Antépulsion du bras"],r:1,e:"Adduction de la hanche"},
+{id:"cqp169",cat:"anat",q:"Un adhérent vous dit qu’il s’est claqué le muscle ischio-jambier, cela veut dire :",opts:["Que son muscle a une inflammation", "Que son muscle est déchiré complètement", "Que son muscle est déchiré partiellement", "Que son muscle a subi un coup"],r:2,e:"Que son muscle est déchiré partiellement"},
+{id:"cqp170",cat:"anat",q:"les phalanges sont des os",opts:["de la main seulement", "du pied seulement", "de la main et du pied"],r:2,e:"de la main et du pied"},
+{id:"cqp171",cat:"anat",q:"A quoi sert la capsule articulaire?",opts:["elle freine l'amplitude du mouvement", "elle contribue au maintien et à la stabilité de l'articulation", "elle augmente l'amplitude du mouvement"],r:1,e:"elle contribue au maintien et à la stabilité de l'articulation"},
+{id:"cqp172",cat:"anat",q:"Le triceps sural fait :",opts:["l’extension du coude.", "la flexion dorsale de la cheville", "la flexion plantaire de la cheville"],r:2,e:"la flexion plantaire de la cheville"},
+{id:"cqp173",cat:"anat",q:"Quel est le rôle principal de la patella (ou rotule):",opts:["stabiliser l'articulation", "protéger le tendon du quadriceps", "n'a pas de rôle particulier"],r:1,e:"protéger le tendon du quadriceps"},
+{id:"cqp174",cat:"anat",q:"Les os plats",opts:["Protègent les organes internes", "Supportent le poids"],r:0,e:"Protègent les organes internes"},
+{id:"cqp175",cat:"anat",q:"Laquelle de ces affirmations est juste ?",opts:["L'axis est constitué exclusivement d'os cortical", "La patella est un os majoritairement spongieux", "On ne trouve pas d'os spongieux dans l'humérus"],r:1,e:"La patella est un os majoritairement spongieux"},
+{id:"cqp176",cat:"anat",q:"Quel est le muscle le plus long du corps humain?",opts:["Quadriceps", "Long adducteur", "Sartorius", "Gracile"],r:2,e:"Sartorius"},
+{id:"cqp177",cat:"anat",q:"Le petit rond :",opts:["N'a pas de rôle dans la stabilisation de l'épaule", "Est rotateur interne du bras", "S'oppose à l'ascension de la tête humérale", "N'est pas un muscle de la coiffe des rotateurs"],r:2,e:"S'oppose à l'ascension de la tête humérale"},
+{id:"cqp178",cat:"anat",q:"L'élévateur de la scapula n'est pas impliqué dans",opts:["l'extension du rachis cervical", "l'inclinaison du rachis cervical", "la stabilisation de la scapula", "la flexion du rachis cervical"],r:3,e:"la flexion du rachis cervical"},
+{id:"cqp179",cat:"nutri",q:"L'avocat est riche en :",opts:["glucides", "protéines", "lipides"],r:2,e:"lipides"},
+{id:"cqp180",cat:"nutri",q:"Comment évaluez-vous la combinaison \"blanc de poulet / brocolis\" d'un point de vue d'équilibre alimentaire ?",opts:["Partiellement équilibrée, car elle manque d'une source de glucides complexes comme les féculents", "Équilibrée, car elle fournit tous les nutriments essentiels", "Déséquilibrée, car elle est trop riche en protéines"],r:0,e:"Partiellement équilibrée, car elle manque d'une source de glucides complexes comme les féculents"},
+{id:"cqp181",cat:"nutri",q:"Combien de Kcal apporte 1 g de glucide?",opts:["9", "8", "7", "4"],r:3,e:"4"},
+{id:"cqp182",cat:"nutri",q:"Une personne souffrant d'hypertension artérielle doit éviter de consommer des plats préparés par l'industrie parce qu'ils contiennent souvent :",opts:["moins de nutriments essentiels", "des niveaux élevés de sel", "des graisses spéciales qui réduisent l'efficacité des médicaments contre l'hypertension"],r:1,e:"des niveaux élevés de sel"},
+{id:"cqp183",cat:"regl",q:"Il existe une LISTE UNIQUE, fournie par l'AMA (Agence Mondiale Antidopage), vérifiée une fois par an avec toutes les substances interdites :",opts:["Vrai", "Faux"],r:1,e:"Faux"},
+{id:"cqp184",cat:"nutri",q:"Quel nutriment trouve-t-on en majorité dans la dinde ?",opts:["Les lipides", "Les protéines", "Les glucides", "Les minéraux"],r:1,e:"Les protéines"},
+{id:"cqp185",cat:"nutri",q:"L'huile d'olive est classée dans :",opts:["les protéines", "les lipides", "les glucides"],r:1,e:"les lipides"},
+{id:"cqp186",cat:"nutri",q:"Un burger peut apporter plus de 500 Kcal:",opts:["Faux", "Vrai"],r:1,e:"Vrai"},
+{id:"cqp187",cat:"nutri",q:"Quel est l'intérêt de consommer des céréales complètes?",opts:["Elles sont plus riches en glucides", "Elles sont plus riches en fibres", "Elles sont plus riches en vitamines"],r:1,e:"Elles sont plus riches en fibres"},
+{id:"cqp188",cat:"nutri",q:"Les fibres appartiennent à la famille des :",opts:["glucides", "protides", "lipides"],r:0,e:"glucides"},
+{id:"cqp189",cat:"nutri",q:"Quel repas vous semble le plus équilibré ?",opts:["filet mignon + pommes de terre - haricots verts + fromage", "riz + fromage râpé + mousse au chocolat", "salade de tomates et concombre + banane"],r:0,e:"filet mignon + pommes de terre - haricots verts + fromage"},
+{id:"cqp190",cat:"nutri",q:"Il est vrai que les antioxydants :",opts:["ils se trouvent spécialement dans le sucre et les graisses animales", "ils peuvent augmenter notre consommation calorique journalière", "sont utiles contre les radicaux libres produits pendant l’exercice et ils combattent le vieillissement cellulaire"],r:2,e:"sont utiles contre les radicaux libres produits pendant l’exercice et ils combattent le vieillissement cellulaire"},
+{id:"cqp191",cat:"nutri",q:"Manger un fruit et légume par jour couvre les besoins en vitamines du corps : vrai ou faux ?",opts:["faux", "vrai"],r:0,e:"faux"},
+{id:"cqp192",cat:"nutri",q:"Comment le Nutri-Score est-il visuellement présenté ?",opts:["Un graphique des pourcentages de l'apport quotidien recommandé", "Une échelle de 1 à 10", "Un code couleur avec des lettres de A à E", "Une liste d'ingrédients"],r:2,e:"Un code couleur avec des lettres de A à E"},
+{id:"cqp193",cat:"nutri",q:"Le HDL (le bon cholestérol) est fourni par la consommation de :",opts:["viande rouge", "avocat", "fromage"],r:1,e:"avocat"},
+{id:"cqp194",cat:"nutri",q:"Les protéines les mieux assimilables par l'organisme sont :",opts:["les protéines végétales", "les protéines animales", "les protéines en poudre"],r:1,e:"les protéines animales"},
+{id:"cqp195",cat:"regl",q:"Qu’est-ce que les stéroïdes anabolisants ?",opts:["Une hormone", "Un neurotransmetteur", "Une enzyme"],r:0,e:"Une hormone"},
+{id:"cqp196",cat:"nutri",q:"Quelle est la recommandation de l'ANSES pour la répartition des protéines dans l’apport énergétique total (AET) quotidien, pour un adulte en bonne santé ?",opts:["45 à 55% de l'AET", "10 à 27% de l'AET", "35 à 40% de l'AET"],r:1,e:"10 à 27% de l'AET"},
+{id:"cqp197",cat:"nutri",q:"Quelle molécule présente dans le vin rouge a des propriétés antioxydantes",opts:["Polyphénols", "Fructose", "Malte"],r:0,e:"Polyphénols"},
+{id:"cqp198",cat:"anat",q:"Les bactéries qui participent au bon fonctionnement des intestins sont appelées:",opts:["Antibiotiques", "Robotiques", "Prébiotiques", "Probiotiques"],r:3,e:"Probiotiques"},
+{id:"cqp199",cat:"anat",q:"Les artères mènent le sang :",opts:["Du coeur vers les organes", "Des organes vers le coeur"],r:0,e:"Du coeur vers les organes"},
+{id:"cqp200",cat:"physio",q:"De quoi dépend la capacité aérobie ?",opts:["des protides et de l’apport en oxygène", "des glucides, des lipides et de l’apport en oxygène"],r:1,e:"des glucides, des lipides et de l’apport en oxygène"},
+{id:"cqp201",cat:"physio",q:"Quelle action ne fait PAS partie des fonctions du système nerveux sympathique ?",opts:["Élévation de la pression artérielle", "Dilatation des bronches", "Stimulation de la digestion", "Augmentation du rythme cardiaque"],r:2,e:"Stimulation de la digestion"},
+{id:"cqp202",cat:"physio",q:"Le VO2 max correspond à la quantité maximale d’oxygène qu’un organisme peut utiliser par :",opts:["unité de temps au cours d’un exercice peu intense et de courte durée", "unité de temps au cours d’un exercice intense et de durée prolongée", "unité de temps au cours d’un exercice intense et de courte durée"],r:1,e:"unité de temps au cours d’un exercice intense et de durée prolongée"},
+{id:"cqp203",cat:"anat",q:"Qu'est ce que le myocarde?",opts:["Le tissu musculaire cardiaque", "L'enveloppe du cœur", "L'enveloppe des poumons"],r:0,e:"Le tissu musculaire cardiaque"},
+{id:"cqp204",cat:"anat",q:"Qu’est-ce que le test de Cooper ?",opts:["Plus grande distance parcourue en 6 min", "Plus grande distance parcourue en 3 min", "Plus grande distance parcourue en 12 min"],r:2,e:"Plus grande distance parcourue en 12 min"},
+{id:"cqp205",cat:"anat",q:"En moyenne, combien de litres d’eau perdons-nous en 24 h ?",opts:["1L - 1,5L", "2L - 2,5 L", "3L - 3,5L"],r:1,e:"2L - 2,5 L"},
+{id:"cqp206",cat:"physio",q:"Quelle est la principale conséquence de l'augmentation du débit cardiaque lors d'une activité physique ?",opts:["Réduction de l'apport en oxygène aux muscles.", "Diminution de la pression artérielle.", "Baisse de la fréquence respiratoire.", "Augmentation de la distribution d'oxygène et de nutriments aux muscles."],r:3,e:"Augmentation de la distribution d'oxygène et de nutriments aux muscles."},
+{id:"cqp207",cat:"anat",q:"Quels termes font référence au cœur ?",opts:["le manubrium", "les artères pulmonaires", "le grand trochanter"],r:1,e:"les artères pulmonaires"},
+{id:"cqp208",cat:"anat",q:"Quel est le trajet de l'air dans les voies respiratoires :",opts:["voies aériennes supérieures, pharynx, larynx, trachée, bronches, poumons, capillaires", "voies aériennes supérieures, trachée, poumons, alvéoles, bronchioles, capillaires", "voies aériennes supérieures jusqu'à la trachée, bronches, poumons, bronchioles, alvéoles, capillaires"],r:2,e:"voies aériennes supérieures jusqu'à la trachée, bronches, poumons, bronchioles, alvéoles, capillaires"},
+{id:"cqp209",cat:"physio",q:"Il s'agit d'une hormone à effet hyperglycémiant :",opts:["la thyroxine", "l'insuline", "le glucagon"],r:2,e:"le glucagon"},
+{id:"cqp210",cat:"anat",q:"La mitochondrie ne peut pas grandir en taille et en nombre :",opts:["Vrai", "Faux"],r:1,e:"Faux"},
+{id:"cqp211",cat:"anat",q:"Parmi ces 4 propositions, laquelle n'est pas une qualité physique ?",opts:["l'accélération", "l'endurance", "la souplesse", "la force"],r:0,e:"l'accélération"},
+{id:"cqp212",cat:"physio",q:"Quel est le seul carburant du muscle?",opts:["ADN", "ARN", "ATP"],r:2,e:"ATP"},
+{id:"cqp213",cat:"nutri",q:"Ou sont stockés les lipides?",opts:["dans les muscles", "dans le sang", "dans le tissu adipeux"],r:2,e:"dans le tissu adipeux"},
+{id:"cqp214",cat:"anat",q:"L'aérobie a un lien direct avec la capacité :",opts:["d'endurance", "de pliométrie", "de vitesse"],r:0,e:"d'endurance"},
+{id:"cqp215",cat:"anat",q:"Combien un adulte possède-t-il d'alvéoles pulmonaires dans ses poumons ?",opts:["Environ 10 000 alvéoles", "Environ 300 millions d'alvéoles", "Environ 1 milliard d'alvéoles", "Environ 1 000 alvéoles"],r:1,e:"Environ 300 millions d'alvéoles"},
+{id:"cqp216",cat:"physio",q:"La cellule musculaire est appelée fibre musculaire :",opts:["Faux", "Vrai"],r:1,e:"Vrai"},
+{id:"cqp217",cat:"physio",q:"Le sang transporte :",opts:["Le message nerveux", "Les nutriments"],r:1,e:"Les nutriments"},
+{id:"cqp218",cat:"physio",q:"Les filières énergétiques se mettent en route uniquement lorsque le stock d'ATP est épuisé.",opts:["Faux", "Vrai"],r:0,e:"Faux"}
 ];
 
 
