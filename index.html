@@ -226,7 +226,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 1020 questions • UC3 • v4.3.4</p>
+    <p class="app-sub">S'adapte à tes lacunes • 1020 questions • UC3 • v4.3.5</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -257,7 +257,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
-    v4.3.4 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+    v4.3.5 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +314,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.3.4 -->
+<!-- ESM supprimé v4.3.5 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -1557,32 +1557,88 @@ async function saveScores() {
 }
 
 function getWeight(qid) {
-  const s = scores[qid].score;
-  // Score 0 = poids 6 (priorité max), 5 = poids 1 (quasi absent)
-  return Math.max(1, 7 - s);
+  // Compatibilité avec appels directs éventuels
+  const s = scores[qid];
+  if (!s) return 10;
+  if (s.seen === 0) return 10;
+  if (s.score >= 5) return 0.2;
+  return Math.max(0.5, 5 - s.score);
 }
 
 function pickQuestions(mode, n) {
   if (mode === 'flagged') {
     return QDB.filter(q => scores[q.id] && scores[q.id].flagged).slice(0, 20);
   }
-  let pool = [...QDB];
-  if (mode === 'weak') {
-    pool = pool.filter(q => scores[q.id].score < 3);
-    if (pool.length < 3) pool = [...QDB]; // fallback
+
+  // ── Calcul des catégories avec erreurs ──────────────────
+  // On compte les erreurs par catégorie pour un rappel thématique
+  const catErrors = {};
+  let totalErrors = 0;
+  QDB.forEach(q => {
+    const s = scores[q.id];
+    if (s && s.seen > 0 && s.score < 3) {
+      catErrors[q.cat] = (catErrors[q.cat] || 0) + 1;
+      totalErrors++;
+    }
+  });
+  // Taux d'erreur par catégorie (0-1)
+  const catErrRate = {};
+  QDB.forEach(q => {
+    if (!catErrRate[q.cat]) {
+      const catTotal = QDB.filter(x => x.cat === q.cat && scores[x.id] && scores[x.id].seen > 0).length;
+      catErrRate[q.cat] = catTotal > 0 ? (catErrors[q.cat] || 0) / catTotal : 0;
+    }
+  });
+
+  // ── Poids adaptatif ─────────────────────────────────────
+  function adaptiveWeight(q) {
+    const s = scores[q.id];
+    if (!s) return 10;
+    if (s.score >= 5) return 0.1; // maîtrisée → quasi-absente
+
+    const errBoost = 1 + (catErrRate[q.cat] || 0) * 2; // x1 à x3 selon erreurs cat.
+
+    if (s.seen === 0) {
+      // Jamais vue → exploration prioritaire, boostée si thème raté
+      return 10 * errBoost;
+    }
+    // Vue et faible → rappel discret (poids 3-5x plus faible que nouvelles)
+    return Math.max(0.5, (5 - s.score) * 0.8);
   }
-  // weighted random
-  const out = [];
-  const used = new Set();
+
+  if (mode === 'weak') {
+    // Mode "Focus lacunes" : uniquement questions vues et ratées
+    let pool = QDB.filter(q => scores[q.id] && scores[q.id].seen > 0 && scores[q.id].score < 3);
+    if (pool.length < 3) pool = QDB.filter(q => scores[q.id] && scores[q.id].score < 3);
+    if (pool.length < 3) pool = [...QDB];
+    const out = [], used = new Set();
+    let attempts = 0;
+    while (out.length < n && attempts < 500) {
+      attempts++;
+      const avail = pool.filter(q => !used.has(q.id));
+      const totalW = avail.reduce((s, q) => s + getWeight(q.id), 0);
+      if (totalW === 0) break;
+      let r = Math.random() * totalW, acc = 0;
+      for (const q of avail) {
+        acc += getWeight(q.id);
+        if (r <= acc) { out.push(q); used.add(q.id); break; }
+      }
+    }
+    return out;
+  }
+
+  // ── Mode adaptatif : exploration + rappel thématique ────
+  const pool = [...QDB];
+  const out = [], used = new Set();
   let attempts = 0;
-  while (out.length < n && attempts < 500) {
+  while (out.length < n && attempts < 2000) {
     attempts++;
-    const totalW = pool.filter(q => !used.has(q.id)).reduce((s,q) => s + getWeight(q.id), 0);
+    const avail = pool.filter(q => !used.has(q.id));
+    const totalW = avail.reduce((s, q) => s + adaptiveWeight(q), 0);
     if (totalW === 0) break;
     let r = Math.random() * totalW, acc = 0;
-    for (const q of pool) {
-      if (used.has(q.id)) continue;
-      acc += getWeight(q.id);
+    for (const q of avail) {
+      acc += adaptiveWeight(q);
       if (r <= acc) { out.push(q); used.add(q.id); break; }
     }
   }
