@@ -153,6 +153,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .dom-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
 .dom-pct{font-size:18px;font-weight:800;line-height:1}
 .dom-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.dom-explor{font-size:10px;color:#64748b;margin-top:4px;text-align:center}
 .dom-bar{height:3px;background:var(--border);border-radius:2px;margin-top:5px;overflow:hidden}
 .dom-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
 
@@ -226,7 +227,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div class="home-top" style="margin-bottom:16px">
     <div class="app-eyebrow">CQP · Instructeur Fitness · HM</div>
     <h1 class="app-title">Révision<br/>Intelligente</h1>
-    <p class="app-sub">S'adapte à tes lacunes • 1020 questions • UC3 • v4.3.5</p>
+    <p class="app-sub">S'adapte à tes lacunes • 1020 questions • UC3 • v4.3.6</p>
 
     <div id="streak-row"></div>
     <div class="stats-row">
@@ -251,13 +252,21 @@ body.dark .rpt-verdict.fail{background:#2d0000}
   <div>
     <button onclick="forceUpdate()" style="width:100%;padding:10px;background:transparent;border:1px dashed #d0dcea;border-radius:12px;color:#94a3b8;font-size:11px;cursor:pointer;margin-bottom:8px;font-family:var(--font)">🔄 Forcer la mise à jour</button>
 <button class="start-btn" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);margin-bottom:8px" onclick="showRapport()">📊 Rapport de préparation</button>
-    <button class="start-btn start-all" onclick="startSession('all')">▶ Session adaptative (10 q.)</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <button class="start-btn start-all" style="flex:1;margin-bottom:0" onclick="startSession('all')">▶ Session adaptative</button>
+      <div style="display:flex;gap:4px">
+        <button id="sz-5"  onclick="setSize(5)"  style="padding:8px 10px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:13px;cursor:pointer">5</button>
+        <button id="sz-10" onclick="setSize(10)" style="padding:8px 10px;border-radius:10px;border:1px solid #3b82f6;background:#1e3a5f;color:#7ab4ff;font-size:13px;cursor:pointer;font-weight:700">10</button>
+        <button id="sz-20" onclick="setSize(20)" style="padding:8px 10px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#94a3b8;font-size:13px;cursor:pointer">20</button>
+      </div>
+    </div>
+    <button class="start-btn" style="background:#0f3a2b;border:1px solid #10b981;color:#6ee7b7;margin-bottom:8px" onclick="startSession('new')">🆕 Découverte — uniquement nouvelles questions</button>
     <button class="start-btn" style="background:#991b1b;border:1px solid #ef4444;color:#fca5a5;margin-bottom:8px" onclick="startRushMode()">⚡ Mode Rush (5 q. / 30s chacune)</button>
     <button class="start-btn" style="background:#1a2d4a;border:1px solid #3b82f6;color:#7ab4ff;margin-bottom:8px" onclick="startExamMode()">🎓 Mode Examen UC3 (60 q. / 30 min)</button>
     <button class="start-btn start-weak" onclick="startSession('weak')">🎯 Focus lacunes uniquement</button>
   </div>
   <div style="text-align:center;padding:8px 0 12px;font-size:10px;color:#c0ccd8;letter-spacing:.08em;margin-top:auto">
-    v4.3.5 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
+    v4.3.6 · <span id="sw-status">⏳</span> · <button onclick="backupData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">💾</button> <button onclick="restoreData()" style="background:none;border:none;color:#c0ccd8;font-size:10px;cursor:pointer;padding:0;font-family:var(--font)">📂</button>
   </div>
 </div>
 
@@ -314,7 +323,7 @@ body.dark .rpt-verdict.fail{background:#2d0000}
 </div>
 
 
-<!-- ESM supprimé v4.3.5 -->
+<!-- ESM supprimé v4.3.6 -->
 <!-- ═══ RESULT ═══ -->
 <div id="result" class="screen">
   <div class="result-header">
@@ -1569,6 +1578,12 @@ function pickQuestions(mode, n) {
   if (mode === 'flagged') {
     return QDB.filter(q => scores[q.id] && scores[q.id].flagged).slice(0, 20);
   }
+  if (mode === 'new') {
+    // Mode découverte : uniquement questions jamais vues, ordre aléatoire
+    const unseen = QDB.filter(q => scores[q.id] && scores[q.id].seen === 0);
+    const shuffled = unseen.sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, sessionSize || 10);
+  }
 
   // ── Calcul des catégories avec erreurs ──────────────────
   // On compte les erreurs par catégorie pour un rappel thématique
@@ -1650,8 +1665,30 @@ function pickQuestions(mode, n) {
 // ══════════════════════════════════════════════════════
 let session = { questions:[], idx:0, correct:0, wrong:0, answered:false, wrongQs:[] };
 
+let sessionSize = parseInt(localStorage.getItem('_cqp_sz')) || 10;
+
+function setSize(n) {
+  sessionSize = n;
+  localStorage.setItem('_cqp_sz', n);
+  [5,10,20].forEach(s => {
+    const btn = document.getElementById('sz-'+s);
+    if (!btn) return;
+    if (s === n) {
+      btn.style.border = '1px solid #3b82f6';
+      btn.style.background = '#1e3a5f';
+      btn.style.color = '#7ab4ff';
+      btn.style.fontWeight = '700';
+    } else {
+      btn.style.border = '1px solid #334155';
+      btn.style.background = '#1e293b';
+      btn.style.color = '#94a3b8';
+      btn.style.fontWeight = 'normal';
+    }
+  });
+}
+
 function startSession(mode) {
-  const qs = pickQuestions(mode, 10);
+  const qs = pickQuestions(mode, sessionSize);
   if (qs.length === 0) { alert("Pas assez de questions disponibles !"); return; }
   session = { questions: qs, idx: 0, correct: 0, wrong: 0, answered: false, wrongQs: [], shuffledCorrect: 0 };
   showScreen('quiz');
@@ -1949,9 +1986,12 @@ function updateHomeStats() {
     box.className = 'dom-box';
     box.onclick = () => startSessionCat(d.key);
     box.style.cursor = 'pointer';
+    const explorPct = qs.length > 0 ? Math.round(seenQs.length / qs.length * 100) : 0;
     box.innerHTML = `<div class="dom-pct" style="color:${d.color}">${pct !== null ? pct+'%' : '—'}</div>
       <div class="dom-lbl">${d.label}</div>
-      <div class="dom-bar"><div class="dom-bar-fill" style="width:${mastPct}%;background:${d.color}"></div></div>`;
+      <div class="dom-bar" title="Maîtrise"><div class="dom-bar-fill" style="width:${mastPct}%;background:${d.color}"></div></div>
+      <div class="dom-explor" title="${seenQs.length}/${qs.length} vues">${seenQs.length}/${qs.length} <span style="color:#94a3b8;font-size:9px">explorées</span></div>
+      <div class="dom-bar" style="margin-top:2px" title="Exploration"><div class="dom-bar-fill" style="width:${explorPct}%;background:#64748b;opacity:.7"></div></div>`;
     domScores.appendChild(box);
   });
 
@@ -1976,13 +2016,18 @@ function updateHomeStats() {
     const btn = document.createElement('button');
     btn.className = 'subj-btn';
     btn.onclick = () => startSessionCat(s.key);
+    const seenQ = qs.filter(q => scores[q.id].seen > 0);
+    const explorPct2 = qs.length > 0 ? Math.round(seenQ.length / qs.length * 100) : 0;
     btn.innerHTML = `
       <span class="subj-dot bg-${s.cls}"></span>
       <div class="subj-info">
         <div class="subj-name">${s.name}</div>
-        <div class="subj-count">${qs.length} questions · ${s.note} · ${mastQ.length} maîtrisées</div>
+        <div class="subj-count">${qs.length} questions · ${seenQ.length} vues (${explorPct2}%) · ${mastQ.length} maîtrisées</div>
       </div>
-      <div class="subj-bar-wrap"><div class="subj-bar bg-${s.cls}" style="width:${pct}%"></div></div>`;
+      <div class="subj-bar-wrap" style="display:flex;flex-direction:column;gap:2px;width:80px">
+        <div style="height:3px;background:#e2e8f0;border-radius:2px"><div style="height:100%;width:${explorPct2}%;background:#64748b;border-radius:2px"></div></div>
+        <div style="height:3px;background:#e2e8f0;border-radius:2px"><div class="subj-bar bg-${s.cls}" style="width:${pct}%"></div></div>
+      </div>`;
     subList.appendChild(btn);
   });
 }
@@ -2430,6 +2475,7 @@ function restoreData() {
 }
 
 function goHome() {
+  setTimeout(() => setSize(sessionSize), 50); // sync boutons taille après rendu
   stopTimer();
   showScreen('home');
   updateHomeStats();
